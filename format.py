@@ -1,5 +1,10 @@
-import subprocess
+from tsr.utils import shell_exec
 
-print(subprocess.check_output("python3 -m black .".split()))
+stdout, stderr = shell_exec("python3 -m black .")
+print(stdout)
+print(stderr)
+
 print("Checking Flake 8")
-print(subprocess.check_output("python3 -m flake8 .".split()))
+stdout, stderr = shell_exec("python3 -m flake8 .")
+print(stdout)
+print(stderr)
