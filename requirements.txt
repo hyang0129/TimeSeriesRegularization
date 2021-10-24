@@ -8,3 +8,4 @@ tensorflow-probability
 tensorflow-datasets
 black
 flake8
+tqdm
