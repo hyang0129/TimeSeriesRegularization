@@ -9,3 +9,4 @@ tensorflow-datasets
 black
 flake8
 tqdm
+pyyaml>=6.0.0

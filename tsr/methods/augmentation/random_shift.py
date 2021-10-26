@@ -44,3 +44,10 @@ class RandomShifter(Augmentation):
         )
 
         return start
+
+    @classmethod
+    def from_config(cls, config):
+
+        return cls(shift_backward_max = config.augment.random_shift.backward,
+                   shift_forward_max = config.augment.random_shift.forward,
+                   sequence_shape = config.model.input_shape)
