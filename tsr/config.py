@@ -12,9 +12,7 @@ class Config(UserDict):
             path_to_config: path to a config file
         """
 
-        super(Config, self).__init__(
-            load(open(path_to_config, "r").read(), Loader=FullLoader)
-        )
+        super(Config, self).__init__(load(open(path_to_config, "r").read(), Loader=FullLoader))
         self.validate_yaml()
         self.as_attr_dict()
 
@@ -36,10 +34,7 @@ class Config(UserDict):
             assert self["model"]["architecture"] in ["RetinaNet"]
 
         except AssertionError as e:
-            msg = (
-                "It appears your YAML configuration is invalid."
-                "The traceback will identify which assertion failed"
-            )
+            msg = "It appears your YAML configuration is invalid." "The traceback will identify which assertion failed"
             if len(e.args) >= 1:
                 e.args = (e.args[0] + msg,) + e.args[1:]
             else:
@@ -60,8 +55,7 @@ class Config(UserDict):
 
         for k in self.keys():
             assert not hasattr(self, k), (
-                "A config top level section has the same name as an existing attribute of the config class. See %s"
-                % k
+                "A config top level section has the same name as an existing attribute of the config class. See %s" % k
             )
             setattr(self, k, attrdict[k])
 
