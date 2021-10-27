@@ -1,0 +1,3 @@
+hyperparameters:
+  NFOLD: 5
+  truncate_last_timesteps: 4096

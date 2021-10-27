@@ -1,8 +1,24 @@
 from collections import UserDict
 from yaml import load, FullLoader
-
+from schema import Schema, And, Use, Optional
+import os
+import inspect
 
 class Config(UserDict):
+
+    schema = Schema(
+        {
+            'hyperparameters' : {
+                'NFOLD' : And( Use(int), int),
+                'truncate_last_timesteps' : And( Use(int), int),
+
+            },
+            Optional(object) : object, # for allowing all keys, should be removed at some point probably
+        }
+    )
+
+    configpypath = inspect.getfile(inspect.currentframe())
+
     def __init__(self, path_to_config="config.yaml"):
         """
         The config object is used as a dictionary with added functionality to pass along parameters
@@ -12,8 +28,9 @@ class Config(UserDict):
             path_to_config: path to a config file
         """
 
-        super(Config, self).__init__(load(open(path_to_config, "r").read(), Loader=FullLoader))
+        self.yaml_contents = load(open(path_to_config, "r").read(), Loader=FullLoader)
         self.validate_yaml()
+        super(Config, self).__init__(self.yaml_contents)
         self.as_attr_dict()
 
     def validate_yaml(self):
@@ -24,22 +41,7 @@ class Config(UserDict):
             Raises an error or returns nothing
         """
 
-        try:
-
-            # TODO: Alternative YAML schema validation should be explored
-            #   after a single full training run has been successfully executed using the yaml configs
-
-            assert self["task"]["type"] in ["object detection"]
-            assert isinstance(self["task"]["num_classes"], int)
-            assert self["model"]["architecture"] in ["RetinaNet"]
-
-        except AssertionError as e:
-            msg = "It appears your YAML configuration is invalid." "The traceback will identify which assertion failed"
-            if len(e.args) >= 1:
-                e.args = (e.args[0] + msg,) + e.args[1:]
-            else:
-                e.args = [msg]
-            raise e
+        self.yaml_contents = self.schema.validate(self.yaml_contents)
 
     def as_attr_dict(self):
         """
@@ -59,6 +61,19 @@ class Config(UserDict):
             )
             setattr(self, k, attrdict[k])
 
+    @classmethod
+    def get_default_config(cls):
+        '''
+        We expect the default config to be stored alongside the config.py
+
+
+        Returns:
+            a config object initialized from the default config file
+        '''
+
+        path = os.path.join(os.path.dirname(cls.configpypath), 'config.yaml')
+
+        return cls(path_to_config = path)
 
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
@@ -77,8 +92,9 @@ class AttrDict(dict):
             return cls({key: cls.from_nested_dicts(data[key]) for key in data})
 
 
+
+
 if __name__ == "__main__":
     c = Config()
     print(c)
 
-    print(c.task.num_classes)

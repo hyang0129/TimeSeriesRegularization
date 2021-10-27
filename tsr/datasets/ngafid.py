@@ -50,7 +50,13 @@ class NGAFID_DatasetManager:
         scaler=None,
     ):
         self.config = config
-        pass
+        self.name = name
+        self.scaler = scaler
+
+        self.dataframe = self.get_ngafid_data_as_dataframe(name=name,
+                                                    scaler=scaler)
+
+        self.create_folded_datasets()
 
     def prepare_for_training(self, ds, shuffle=False, repeat=False, aug=False):
 
@@ -76,10 +82,10 @@ class NGAFID_DatasetManager:
     def create_folded_datasets(self):
 
         self.folded_datasets = []
-        df = self.df
-        for i in range(self.config.NFOLD):
+        df = self.dataframe
+        for i in range(self.config.hyperparameters.NFOLD):
             self.folded_datasets.append(
-                self.ngafid_dataframe_to_dataset(df[df.split == i], truncate_last_timesteps=4096)
+                self.ngafid_dataframe_to_dataset(df[df.split == i], truncate_last_timesteps=self.config.hyperparameters.truncate_last_timesteps)
             )
 
     def get_train_and_val_for_fold(self, fold) -> (tf.data.Dataset, tf.data.Dataset):
@@ -87,7 +93,7 @@ class NGAFID_DatasetManager:
         config = self.config
 
         train = []
-        for i in range(config.NFOLD):
+        for i in range(config.hyperparameters.NFOLD):
             if i == fold:
                 val_ds = self.folded_datasets[i]
             else:
@@ -103,7 +109,8 @@ class NGAFID_DatasetManager:
         return train_ds, val_ds
 
     @classmethod
-    def get_ngafid_data_as_dataframe(cls, name="2021_IAAI_C28", scaler=None, skip_scaler=False):
+    def get_ngafid_data_as_dataframe(cls, name: str, scaler: object = None, skip_scaler: bool = False) -> pd.DataFrame:
+
 
         url = cls.ngafid_urls[name]
         output = "data.csv.gz"
