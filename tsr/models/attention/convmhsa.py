@@ -1,9 +1,11 @@
-from tensorflow import tf
+import tensorflow as tf
 
 from tsr.models.attention import EncoderLayer
 
 tfk = tf.keras
 tfkl = tf.keras.layers
+
+
 
 
 def get_mhsa_model(
