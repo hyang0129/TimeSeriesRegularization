@@ -43,3 +43,6 @@ class Augmentation(ABC):
         Returns:
                 tf.Tensor
         """
+
+    def __call__(self, *args, **kwargs):
+        return self.call(*args, **kwargs)
