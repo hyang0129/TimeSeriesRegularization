@@ -12,6 +12,8 @@ class Config(UserDict):
             "hyperparameters": {
                 "NFOLD": And(Use(int), int),
                 "truncate_last_timesteps": And(Use(int), int),
+                "num_class" : And(Use(int), int),
+                "batch_size" : And(Use(int), int),
             },
             Optional(object): object,  # for allowing all keys, should be removed at some point probably
         }

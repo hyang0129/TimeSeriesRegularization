@@ -1,1 +1,1 @@
-from tsr import datasets, methods, models
+from tsr import datasets, methods, models, config
