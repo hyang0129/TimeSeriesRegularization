@@ -1,3 +1,6 @@
 hyperparameters:
   NFOLD: 5
   truncate_last_timesteps: 4096
+  num_class: 2
+  batch_size: 32
+

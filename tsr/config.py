@@ -4,16 +4,16 @@ from schema import Schema, And, Use, Optional
 import os
 import inspect
 
+
 class Config(UserDict):
 
     schema = Schema(
         {
-            'hyperparameters' : {
-                'NFOLD' : And( Use(int), int),
-                'truncate_last_timesteps' : And( Use(int), int),
-
+            "hyperparameters": {
+                "NFOLD": And(Use(int), int),
+                "truncate_last_timesteps": And(Use(int), int),
             },
-            Optional(object) : object, # for allowing all keys, should be removed at some point probably
+            Optional(object): object,  # for allowing all keys, should be removed at some point probably
         }
     )
 
@@ -63,17 +63,18 @@ class Config(UserDict):
 
     @classmethod
     def get_default_config(cls):
-        '''
+        """
         We expect the default config to be stored alongside the config.py
 
 
         Returns:
             a config object initialized from the default config file
-        '''
+        """
 
-        path = os.path.join(os.path.dirname(cls.configpypath), 'config.yaml')
+        path = os.path.join(os.path.dirname(cls.configpypath), "config.yaml")
 
-        return cls(path_to_config = path)
+        return cls(path_to_config=path)
+
 
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
@@ -92,9 +93,6 @@ class AttrDict(dict):
             return cls({key: cls.from_nested_dicts(data[key]) for key in data})
 
 
-
-
 if __name__ == "__main__":
     c = Config()
     print(c)
-
