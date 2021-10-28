@@ -4,11 +4,12 @@ import numpy as np
 from sklearn import preprocessing
 from tqdm.autonotebook import tqdm
 import tensorflow as tf
+from loguru import logger
 
 from tsr.utils import shell_exec
 from tsr.datasets.common import fix_type
 from tsr.methods.augmentation.random_shift import RandomShifter
-from loguru import logger
+from tsr.config import Config
 
 
 class NGAFID_DatasetManager:
@@ -46,7 +47,7 @@ class NGAFID_DatasetManager:
 
     def __init__(
         self,
-        config,
+        config:Config,
         name="2021_IAAI_C28",
         scaler=None,
     ):
@@ -59,7 +60,7 @@ class NGAFID_DatasetManager:
 
         self.create_folded_datasets()
 
-    def prepare_tfdataset(self, ds, shuffle=False, repeat=False, aug=False):
+    def prepare_tfdataset(self, ds, shuffle:bool=False, repeat:bool=False, aug:bool=False):
 
         ds = ds.map(fix_type)
 
@@ -92,8 +93,8 @@ class NGAFID_DatasetManager:
                 )
             )
 
-    def get_train_and_val_for_fold(self, fold) -> (tf.data.Dataset, tf.data.Dataset):
-
+    def get_train_and_val_for_fold(self, fold : int) -> (tf.data.Dataset, tf.data.Dataset):
+        logger.debug("Retrieving Fold %i" % fold)
         config = self.config
 
         train = []
@@ -114,6 +115,7 @@ class NGAFID_DatasetManager:
 
     @classmethod
     def get_ngafid_data_as_dataframe(cls, name: str, scaler: object = None, skip_scaler: bool = False) -> pd.DataFrame:
+        logger.debug("Downloading NGAFID Data")
 
         url = cls.ngafid_urls[name]
         output = "data.csv.gz"
