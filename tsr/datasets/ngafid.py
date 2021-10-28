@@ -64,7 +64,6 @@ class NGAFID_DatasetManager:
 
     def prepare_tfdataset(self, ds, shuffle: bool = False, repeat: bool = False, aug: bool = False) -> tf.data.Dataset:
         logger.debug("Preparing basic TF Dataset for Training or Inference Usage")
-        ds = ds.map(fix_type)
 
         ds = ds.shuffle(self.config.hyperparameters.truncate_last_timesteps) if shuffle else ds
         ds = ds.repeat() if repeat else ds
@@ -197,6 +196,7 @@ class NGAFID_DatasetManager:
         afters = np.stack(afters)
 
         ds = tf.data.Dataset.from_tensor_slices((sensor_datas, afters))
+        ds = ds.map(fix_type)
         ds = ds.map(lambda x, y: {'input': x, 'target':y})
 
         logger.debug("Successfully Converted Dataframe to Basic TF Dataset")
