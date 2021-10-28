@@ -133,12 +133,11 @@ class NGAFID_DatasetManager:
 
         logger.debug('Reading Full Dataframe')
         df = pd.read_csv(filename, engine="c", dtype=float32_cols)
-        df["id"] = df.id.astype("int32  ")
+        df["id"] = df.id.astype("int32")
         df = df.dropna()  # you can handle nans differently, but ymmv
         sources = df[["id", "plane_id", "split", "date_diff", "before_after"]].drop_duplicates()
 
         if not skip_scaler:
-            logger.debug("Applying Scaler")
             df = cls.apply_scaler(df, scaler=scaler)
 
         logger.debug("Successfully Read Data as Dataframe")
@@ -146,18 +145,21 @@ class NGAFID_DatasetManager:
 
     @classmethod
     def apply_scaler(cls, df, scaler=None, apply=True):
-
+        logger.debug("Applying Scaler")
         if scaler is None:
+            logger.debug('Calculating New Scaler')
             scaler = preprocessing.MinMaxScaler()
             scaler.fit(df.loc[:, cls.input_columns].sample(100000, random_state=0))
 
         if apply:
+            logger.debug('Using Scaler to Transform Data')
             arr = df.loc[:, cls.input_columns].values
             res = scaler.transform(arr)
 
             for i, col in tqdm(enumerate(cls.input_columns)):
                 df.loc[:, col] = res[:, i]
 
+        logger.debug('Scaling Applied Successfully')
         return df, scaler
 
     @classmethod
