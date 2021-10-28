@@ -56,9 +56,9 @@ class NGAFID_DatasetManager:
         self.name = name
         self.scaler = scaler
 
-        self.dataframe = self.get_ngafid_data_as_dataframe(name=name, scaler=scaler)
+        self.dataframe, self.dataframe_sources = self.get_ngafid_data_as_dataframe(name=name, scaler=scaler)
 
-        # self.create_folded_datasets()
+        self.create_folded_datasets()
 
     def prepare_tfdataset(self, ds, shuffle:bool=False, repeat:bool=False, aug:bool=False):
         logger.debug('Preparing basic TF Dataset for Training or Inference Usage')
@@ -119,7 +119,7 @@ class NGAFID_DatasetManager:
         return train_ds, val_ds
 
     @classmethod
-    def get_ngafid_data_as_dataframe(cls, name: str, scaler: object = None, skip_scaler: bool = False) -> pd.DataFrame:
+    def get_ngafid_data_as_dataframe(cls, name: str, scaler: object = None, skip_scaler: bool = False) -> (pd.DataFrame, pd.DataFrame):
         logger.debug("Downloading NGAFID Data")
 
         url = cls.ngafid_urls[name]
