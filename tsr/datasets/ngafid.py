@@ -58,10 +58,10 @@ class NGAFID_DatasetManager:
 
         self.dataframe = self.get_ngafid_data_as_dataframe(name=name, scaler=scaler)
 
-        self.create_folded_datasets()
+        # self.create_folded_datasets()
 
     def prepare_tfdataset(self, ds, shuffle:bool=False, repeat:bool=False, aug:bool=False):
-
+        logger.debug('Preparing basic TF Dataset for Training or Inference Usage')
         ds = ds.map(fix_type)
 
         ds = ds.shuffle(self.config.hyperparameters.truncate_last_timesteps) if shuffle else ds
@@ -80,9 +80,11 @@ class NGAFID_DatasetManager:
         else:
             ds = ds.map(lambda x, y: (x, tf.reshape(y, (self.config.hyperparameters.batch_size, 1))))
 
+        logger.debug('Successfully prepared basic TF Dataset for Training or Inference Usage')
         return ds
 
     def create_folded_datasets(self):
+        logger.debug("Creating Datasets, but using slices of the dataframe to get folds")
 
         self.folded_datasets = []
         df = self.dataframe
@@ -92,6 +94,8 @@ class NGAFID_DatasetManager:
                     df[df.split == i], truncate_last_timesteps=self.config.hyperparameters.truncate_last_timesteps
                 )
             )
+
+        logger.debug("Successfully created folded datasets")
 
     def get_train_and_val_for_fold(self, fold : int) -> (tf.data.Dataset, tf.data.Dataset):
         logger.debug("Retrieving Fold %i" % fold)
@@ -111,6 +115,7 @@ class NGAFID_DatasetManager:
         train_ds = self.prepare_tfdataset(train_ds, shuffle=True, repeat=True, predict=True, aug=True)
         val_ds = self.prepare_tfdataset(val_ds, shuffle=False, predict=True)
 
+        logger.debug("Successfully Retrieved Fold %i" % fold)
         return train_ds, val_ds
 
     @classmethod
@@ -164,12 +169,13 @@ class NGAFID_DatasetManager:
 
     @classmethod
     def ngafid_dataframe_to_dataset(cls, df=None, truncate_last_timesteps=4096) -> tf.data.Dataset:
-
+        logger.debug('Converting Dataframe to Basic TF Dataset')
         ids = df.id.unique()
 
         sensor_datas = []
         afters = []
 
+        logger.debug('Looping over each unique ID')
         for id in tqdm(ids):
             sensor_data = df[df.id == id].iloc[-truncate_last_timesteps:, :23].values
 
@@ -182,9 +188,11 @@ class NGAFID_DatasetManager:
             sensor_datas.append(sensor_data)
             afters.append(after)
 
+        logger.debug('Stacking lists of Tensors')
         sensor_datas = tf.stack(sensor_datas)
         afters = np.stack(afters)
 
         ds = tf.data.Dataset.from_tensor_slices((sensor_datas, afters))
 
+        logger.debug('Successfully Converted Dataframe to Basic TF Dataset')
         return ds
