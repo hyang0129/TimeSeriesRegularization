@@ -5,7 +5,7 @@ tfkl = tf.keras.layers
 tfk = tf.keras
 
 
-class Augmentation(ABC, tfkl.Layer):
+class Augmentation(ABC):
     @abstractmethod
     def __init__(self):
         """
