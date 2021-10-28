@@ -112,8 +112,8 @@ class NGAFID_DatasetManager:
         for ds in train:
             train_ds = ds if train_ds is None else train_ds.concatenate(ds)
 
-        train_ds = self.prepare_tfdataset(train_ds, shuffle=True, repeat=True, predict=True, aug=True)
-        val_ds = self.prepare_tfdataset(val_ds, shuffle=False, predict=True)
+        train_ds = self.prepare_tfdataset(train_ds, shuffle=True, repeat=True, aug=True)
+        val_ds = self.prepare_tfdataset(val_ds, shuffle=False)
 
         logger.debug("Successfully Retrieved Fold %i" % fold)
         return train_ds, val_ds
