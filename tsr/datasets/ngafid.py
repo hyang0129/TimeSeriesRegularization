@@ -196,6 +196,7 @@ class NGAFID_DatasetManager:
         afters = np.stack(afters)
 
         ds = tf.data.Dataset.from_tensor_slices((sensor_datas, afters))
+        ds = ds.map(lambda x, y: {'input': x, 'target':y})
 
         logger.debug("Successfully Converted Dataframe to Basic TF Dataset")
         return ds
