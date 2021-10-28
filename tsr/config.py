@@ -20,6 +20,12 @@ class Config(UserDict):
             "model" : {
                 "architecture_name" : And(Use(str), str),
             },
+            "augment": {
+                "random_shift" : {
+                    "backward" : And(Use(int), int),
+                    "forward" : And(Use(int), int),
+                }
+            },
             "environment" : {
                 'type' : And(Use(str), str),
             },
