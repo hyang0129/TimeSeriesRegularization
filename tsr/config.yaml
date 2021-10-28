@@ -5,3 +5,5 @@ hyperparameters:
   batch_size: 32
 model:
   architecture_name: conv_mhsa
+environment:
+  type: colab_tpu

@@ -18,6 +18,9 @@ class Config(UserDict):
             "model" : {
                 "architecture_name" : And(Use(str), str),
             },
+            "environment" : {
+                'type' : And(Use(str), str),
+            },
             Optional(object): object,  # for allowing all keys, should be removed at some point probably
         }
     )

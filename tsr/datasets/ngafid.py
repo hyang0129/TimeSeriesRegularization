@@ -60,7 +60,7 @@ class NGAFID_DatasetManager:
 
         self.create_folded_datasets()
 
-    def prepare_tfdataset(self, ds, shuffle:bool=False, repeat:bool=False, aug:bool=False):
+    def prepare_tfdataset(self, ds, shuffle:bool=False, repeat:bool=False, aug:bool=False) -> tf.data.Dataset:
         logger.debug('Preparing basic TF Dataset for Training or Inference Usage')
         ds = ds.map(fix_type)
 
@@ -119,7 +119,7 @@ class NGAFID_DatasetManager:
         return train_ds, val_ds
 
     @classmethod
-    def get_ngafid_data_as_dataframe(cls, name: str, scaler: object = None, skip_scaler: bool = False) -> (pd.DataFrame, pd.DataFrame):
+    def get_ngafid_data_as_dataframe(cls, name: str, scaler: object = None, skip_scaler: bool = False) -> (pd.DataFrame, pd.DataFrame, object):
         logger.debug("Downloading NGAFID Data")
 
         url = cls.ngafid_urls[name]
@@ -149,7 +149,7 @@ class NGAFID_DatasetManager:
         return df, sources, scaler
 
     @classmethod
-    def apply_scaler(cls, df, scaler=None, apply=True):
+    def apply_scaler(cls, df, scaler=None, apply=True) -> (pd.DataFrame, object):
         logger.debug("Applying Scaler")
         if scaler is None:
             logger.debug('Calculating New Scaler')
