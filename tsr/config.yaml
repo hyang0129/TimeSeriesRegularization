@@ -3,4 +3,5 @@ hyperparameters:
   truncate_last_timesteps: 4096
   num_class: 2
   batch_size: 32
-
+model:
+  architecture_name: conv_mhsa

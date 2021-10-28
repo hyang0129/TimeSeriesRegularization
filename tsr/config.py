@@ -15,6 +15,9 @@ class Config(UserDict):
                 "num_class" : And(Use(int), int),
                 "batch_size" : And(Use(int), int),
             },
+            "model" : {
+                "architecture_name" : And(Use(str), str),
+            },
             Optional(object): object,  # for allowing all keys, should be removed at some point probably
         }
     )

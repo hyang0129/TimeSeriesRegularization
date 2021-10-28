@@ -56,7 +56,7 @@ class NGAFID_DatasetManager:
         self.name = name
         self.scaler = scaler
 
-        self.dataframe, self.dataframe_sources = self.get_ngafid_data_as_dataframe(name=name, scaler=scaler)
+        self.dataframe, self.dataframe_sources, self.scaler = self.get_ngafid_data_as_dataframe(name=name, scaler=scaler)
 
         self.create_folded_datasets()
 
@@ -143,10 +143,10 @@ class NGAFID_DatasetManager:
         sources = df[["id", "plane_id", "split", "date_diff", "before_after"]].drop_duplicates()
 
         if not skip_scaler:
-            df = cls.apply_scaler(df, scaler=scaler)
+            df, scaler = cls.apply_scaler(df, scaler=scaler)
 
         logger.debug("Successfully Read Data as Dataframe")
-        return df, sources
+        return df, sources, scaler
 
     @classmethod
     def apply_scaler(cls, df, scaler=None, apply=True):
