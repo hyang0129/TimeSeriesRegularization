@@ -122,7 +122,7 @@ class NGAFID_DatasetManager:
         gdown.download(url, output, quiet=False)
 
         logger.debug('Unzipping Data')
-        shell_exec("yes | gzip -d data.csv.gz")
+        shell_exec("gzip -f -d data.csv.gz")
 
 
         filename = "data.csv"

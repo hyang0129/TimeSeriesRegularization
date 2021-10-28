@@ -3,7 +3,8 @@ import subprocess
 
 def shell_exec(command_as_string):
     """
-    Executes the command in shell script
+    Executes the command in shell script. Avoid using the yes | command pattern as that seems to cause an out of memory
+    issue.
 
     Args:
         command_as_string: just a string, as if you were typing it into a  terminal
