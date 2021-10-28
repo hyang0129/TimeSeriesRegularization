@@ -6,10 +6,8 @@ tfk = tf.keras
 tfkl = tf.keras.layers
 
 
-
-
 def get_mhsa_model(
-    strategy : tf.distribute.Strategy,
+    strategy: tf.distribute.Strategy,
     input_shape=(4096, 23),
     conv_filters=[128, 128, 256, 256, 512],
     kernel=[7, 7, 3, 7, 7],

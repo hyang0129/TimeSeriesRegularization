@@ -47,7 +47,7 @@ class NGAFID_DatasetManager:
 
     def __init__(
         self,
-        config:Config,
+        config: Config,
         name="2021_IAAI_C28",
         scaler=None,
     ):
@@ -56,12 +56,14 @@ class NGAFID_DatasetManager:
         self.name = name
         self.scaler = scaler
 
-        self.dataframe, self.dataframe_sources, self.scaler = self.get_ngafid_data_as_dataframe(name=name, scaler=scaler)
+        self.dataframe, self.dataframe_sources, self.scaler = self.get_ngafid_data_as_dataframe(
+            name=name, scaler=scaler
+        )
 
         self.create_folded_datasets()
 
-    def prepare_tfdataset(self, ds, shuffle:bool=False, repeat:bool=False, aug:bool=False) -> tf.data.Dataset:
-        logger.debug('Preparing basic TF Dataset for Training or Inference Usage')
+    def prepare_tfdataset(self, ds, shuffle: bool = False, repeat: bool = False, aug: bool = False) -> tf.data.Dataset:
+        logger.debug("Preparing basic TF Dataset for Training or Inference Usage")
         ds = ds.map(fix_type)
 
         ds = ds.shuffle(self.config.hyperparameters.truncate_last_timesteps) if shuffle else ds
@@ -70,7 +72,7 @@ class NGAFID_DatasetManager:
         ds = ds.map(RandomShifter.from_config(self.config))
 
         if aug:
-            logger.debug('Adding Augmentations when Preparing Dataset')
+            logger.debug("Adding Augmentations when Preparing Dataset")
             pass
             # batch_aug = get_batch_aug()
             # ds = ds.map(batch_aug)
@@ -80,7 +82,7 @@ class NGAFID_DatasetManager:
         else:
             ds = ds.map(lambda x, y: (x, tf.reshape(y, (self.config.hyperparameters.batch_size, 1))))
 
-        logger.debug('Successfully prepared basic TF Dataset for Training or Inference Usage')
+        logger.debug("Successfully prepared basic TF Dataset for Training or Inference Usage")
         return ds
 
     def create_folded_datasets(self):
@@ -97,7 +99,7 @@ class NGAFID_DatasetManager:
 
         logger.debug("Successfully created folded datasets")
 
-    def get_train_and_val_for_fold(self, fold : int) -> (tf.data.Dataset, tf.data.Dataset):
+    def get_train_and_val_for_fold(self, fold: int) -> (tf.data.Dataset, tf.data.Dataset):
         logger.debug("Retrieving Fold %i" % fold)
         config = self.config
 
@@ -119,16 +121,17 @@ class NGAFID_DatasetManager:
         return train_ds, val_ds
 
     @classmethod
-    def get_ngafid_data_as_dataframe(cls, name: str, scaler: object = None, skip_scaler: bool = False) -> (pd.DataFrame, pd.DataFrame, object):
+    def get_ngafid_data_as_dataframe(
+        cls, name: str, scaler: object = None, skip_scaler: bool = False
+    ) -> (pd.DataFrame, pd.DataFrame, object):
         logger.debug("Downloading NGAFID Data")
 
         url = cls.ngafid_urls[name]
         output = "data.csv.gz"
         gdown.download(url, output, quiet=False)
 
-        logger.debug('Unzipping Data')
+        logger.debug("Unzipping Data")
         shell_exec("gzip -f -d data.csv.gz")
-
 
         filename = "data.csv"
         df_test = pd.read_csv(filename, nrows=100)
@@ -136,7 +139,7 @@ class NGAFID_DatasetManager:
         float_cols = [c for c in df_test if df_test[c].dtype == "float64"]
         float32_cols = {c: np.float16 for c in float_cols}
 
-        logger.debug('Reading Full Dataframe')
+        logger.debug("Reading Full Dataframe")
         df = pd.read_csv(filename, engine="c", dtype=float32_cols)
         df["id"] = df.id.astype("int32")
         df = df.dropna()  # you can handle nans differently, but ymmv
@@ -152,30 +155,30 @@ class NGAFID_DatasetManager:
     def apply_scaler(cls, df, scaler=None, apply=True) -> (pd.DataFrame, object):
         logger.debug("Applying Scaler")
         if scaler is None:
-            logger.debug('Calculating New Scaler')
+            logger.debug("Calculating New Scaler")
             scaler = preprocessing.MinMaxScaler()
             scaler.fit(df.loc[:, cls.input_columns].sample(100000, random_state=0))
 
         if apply:
-            logger.debug('Using Scaler to Transform Data')
+            logger.debug("Using Scaler to Transform Data")
             arr = df.loc[:, cls.input_columns].values
             res = scaler.transform(arr)
 
             for i, col in tqdm(enumerate(cls.input_columns)):
                 df.loc[:, col] = res[:, i]
 
-        logger.debug('Scaling Applied Successfully')
+        logger.debug("Scaling Applied Successfully")
         return df, scaler
 
     @classmethod
     def ngafid_dataframe_to_dataset(cls, df=None, truncate_last_timesteps=4096) -> tf.data.Dataset:
-        logger.debug('Converting Dataframe to Basic TF Dataset')
+        logger.debug("Converting Dataframe to Basic TF Dataset")
         ids = df.id.unique()
 
         sensor_datas = []
         afters = []
 
-        logger.debug('Looping over each unique ID')
+        logger.debug("Looping over each unique ID")
         for id in tqdm(ids):
             sensor_data = df[df.id == id].iloc[-truncate_last_timesteps:, :23].values
 
@@ -188,11 +191,11 @@ class NGAFID_DatasetManager:
             sensor_datas.append(sensor_data)
             afters.append(after)
 
-        logger.debug('Stacking lists of Tensors')
+        logger.debug("Stacking lists of Tensors")
         sensor_datas = tf.stack(sensor_datas)
         afters = np.stack(afters)
 
         ds = tf.data.Dataset.from_tensor_slices((sensor_datas, afters))
 
-        logger.debug('Successfully Converted Dataframe to Basic TF Dataset')
+        logger.debug("Successfully Converted Dataframe to Basic TF Dataset")
         return ds
