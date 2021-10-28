@@ -77,7 +77,7 @@ class NGAFID_DatasetManager:
             # ds = ds.map(batch_aug)
 
         ds = ds.map(lambda example: (example['input'], example['target']))
-        if self.config.model.num_class > 2:
+        if self.config.hyperparameters.num_class > 2:
             ds = ds.map(lambda x, y: (x, tf.one_hot(y, self.config.hyperparameters.num_class)))
         else:
             ds = ds.map(lambda x, y: (x, tf.reshape(y, (self.config.hyperparameters.batch_size, 1))))
