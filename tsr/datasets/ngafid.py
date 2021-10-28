@@ -121,7 +121,9 @@ class NGAFID_DatasetManager:
         output = "data.csv.gz"
         gdown.download(url, output, quiet=False)
 
+        logger.debug('Unzipping Data')
         shell_exec("yes | gzip -d data.csv.gz")
+
 
         filename = "data.csv"
         df_test = pd.read_csv(filename, nrows=100)
@@ -129,14 +131,17 @@ class NGAFID_DatasetManager:
         float_cols = [c for c in df_test if df_test[c].dtype == "float64"]
         float32_cols = {c: np.float16 for c in float_cols}
 
+        logger.debug('Reading Full Dataframe')
         df = pd.read_csv(filename, engine="c", dtype=float32_cols)
         df["id"] = df.id.astype("int32  ")
         df = df.dropna()  # you can handle nans differently, but ymmv
         sources = df[["id", "plane_id", "split", "date_diff", "before_after"]].drop_duplicates()
 
         if not skip_scaler:
+            logger.debug("Applying Scaler")
             df = cls.apply_scaler(df, scaler=scaler)
 
+        logger.debug("Successfully Read Data as Dataframe")
         return df, sources
 
     @classmethod
