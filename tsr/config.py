@@ -14,6 +14,8 @@ class Config(UserDict):
                 "truncate_last_timesteps": And(Use(int), int),
                 "num_class" : And(Use(int), int),
                 "batch_size" : And(Use(int), int),
+                "training_epochs" : And(Use(int), int),
+                "training_steps_per_epoch" : And(Use(int), int),
             },
             "model" : {
                 "architecture_name" : And(Use(str), str),

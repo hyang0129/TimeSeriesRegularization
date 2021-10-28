@@ -3,6 +3,8 @@ hyperparameters:
   truncate_last_timesteps: 4096
   num_class: 2
   batch_size: 32
+  training_epochs: 30
+  training_steps_per_epoch: 500
 model:
   architecture_name: conv_mhsa
 environment:
