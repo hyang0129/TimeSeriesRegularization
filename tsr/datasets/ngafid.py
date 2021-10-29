@@ -7,7 +7,7 @@ import tensorflow as tf
 from loguru import logger
 
 from tsr.utils import shell_exec
-from tsr.datasets.common import fix_type
+from tsr.datasets.common import fix_type, Reshaper
 from tsr.methods.augmentation.random_shift import RandomShifter
 from tsr.config import Config
 
@@ -75,6 +75,11 @@ class NGAFID_DatasetManager:
             pass
             # batch_aug = get_batch_aug()
             # ds = ds.map(batch_aug)
+
+
+        # force shape
+        desired_input_shape = [self.config.hyperparameters.batch_size] + list(self.config.model.input_shape)
+        ds = ds.map(Reshaper(input_shape = desired_input_shape))
 
         ds = ds.map(lambda example: (example['input'], example['target']))
         if self.config.hyperparameters.num_class > 2:
