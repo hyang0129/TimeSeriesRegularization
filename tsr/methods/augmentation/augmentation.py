@@ -6,7 +6,7 @@ tfkl = tf.keras.layers
 tfk = tf.keras
 
 
-class Augmentation(ABC, Transform):
+class Augmentation(Transform):
     '''
     Functionally, augmentations are the same as transforms
     '''
