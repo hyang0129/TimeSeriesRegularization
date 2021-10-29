@@ -12,7 +12,7 @@ from tsr.methods.augmentation.random_shift import RandomShifter
 from tsr.config import Config
 
 
-class NGAFID_DatasetManager:
+class NGAFID_DatasetManager():
 
     ngafid_urls = {
         "2021_IAAI_C28": "https://drive.google.com/uc?id=1R5q2s-QavuI6DKj9z2rNxQPIOrbJlwUM",
