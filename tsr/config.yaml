@@ -7,5 +7,11 @@ hyperparameters:
   training_steps_per_epoch: 500
 model:
   architecture_name: conv_mhsa
+  input_shape: [4096, 23]
+augment:
+  random_shift:
+    backward: 64
+    forward: 64
 environment:
   type: colab_tpu
+
