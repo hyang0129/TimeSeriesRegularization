@@ -2,8 +2,10 @@ import tensorflow as tf
 from abc import ABC, abstractmethod
 from typing import Union
 
+
 def fix_type(x, y):
     return tf.cast(x, tf.float32), tf.cast(y, tf.float32)
+
 
 class Transform(ABC):
     @abstractmethod
@@ -44,19 +46,20 @@ class Transform(ABC):
                 tf.Tensor
         """
 
-    def __call__(self, example:dict):
+    def __call__(self, example: dict):
         return self.call(example)
 
+
 class Reshaper(Transform):
-    def __init__(self, input_shape : Union[list, tuple, None] = None, target_shape : Union[list, tuple, None] = None):
+    def __init__(self, input_shape: Union[list, tuple, None] = None, target_shape: Union[list, tuple, None] = None):
         self.input_shape = input_shape
         self.target_shape = target_shape
 
     def singular_call(self):
-        raise NotImplementedError('This is purely a batchwise operation')
+        raise NotImplementedError("This is purely a batchwise operation")
 
     def call(self, example: dict) -> dict:
-        '''
+        """
 
 
 
@@ -65,13 +68,11 @@ class Reshaper(Transform):
 
         Returns:
 
-        '''
+        """
 
         if self.input_shape is not None:
-            example['input'] = tf.reshape(example['input'], self.input_shape)
+            example["input"] = tf.reshape(example["input"], self.input_shape)
         if self.target_shape is not None:
-            example['target'] = tf.reshape(example['target'], self.target_shape)
+            example["target"] = tf.reshape(example["target"], self.target_shape)
 
         return example
-
-

@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 import tensorflow as tf
 from tsr.datasets.common import Transform
 
@@ -7,6 +6,6 @@ tfk = tf.keras
 
 
 class Augmentation(Transform):
-    '''
+    """
     Functionally, augmentations are the same as transforms
-    '''
+    """

@@ -12,7 +12,7 @@ from tsr.methods.augmentation.random_shift import RandomShifter
 from tsr.config import Config
 
 
-class NGAFID_DatasetManager():
+class NGAFID_DatasetManager:
 
     ngafid_urls = {
         "2021_IAAI_C28": "https://drive.google.com/uc?id=1R5q2s-QavuI6DKj9z2rNxQPIOrbJlwUM",
@@ -76,12 +76,11 @@ class NGAFID_DatasetManager():
             # batch_aug = get_batch_aug()
             # ds = ds.map(batch_aug)
 
-
         # force shape
         desired_input_shape = [self.config.hyperparameters.batch_size] + list(self.config.model.input_shape)
-        ds = ds.map(Reshaper(input_shape = desired_input_shape))
+        ds = ds.map(Reshaper(input_shape=desired_input_shape))
 
-        ds = ds.map(lambda example: (example['input'], example['target']))
+        ds = ds.map(lambda example: (example["input"], example["target"]))
         if self.config.hyperparameters.num_class > 2:
             ds = ds.map(lambda x, y: (x, tf.one_hot(y, self.config.hyperparameters.num_class)))
         else:
@@ -105,6 +104,9 @@ class NGAFID_DatasetManager():
         logger.debug("Successfully created folded datasets")
 
     def get_train_and_val_for_fold(self, fold: int) -> (tf.data.Dataset, tf.data.Dataset):
+        # TODO: Reorganize this method somehow since you will be using it in all datasets
+        #       Actually just implement this as the abstractmethod and then super() it
+
         logger.debug("Retrieving Fold %i" % fold)
         config = self.config
 
@@ -202,7 +204,7 @@ class NGAFID_DatasetManager():
 
         ds = tf.data.Dataset.from_tensor_slices((sensor_datas, afters))
         ds = ds.map(fix_type)
-        ds = ds.map(lambda x, y: {'input': x, 'target':y})
+        ds = ds.map(lambda x, y: {"input": x, "target": y})
 
         logger.debug("Successfully Converted Dataframe to Basic TF Dataset")
         return ds
