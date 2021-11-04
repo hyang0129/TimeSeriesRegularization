@@ -12,3 +12,4 @@ tqdm
 pyyaml>=6.0.0
 schema
 loguru
+pyreadr
