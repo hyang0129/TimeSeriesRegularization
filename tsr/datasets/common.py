@@ -11,8 +11,8 @@ class Transform(ABC):
     @abstractmethod
     def __init__(self):
         """
-        Augmentations should be defined as a callable class with an initialization function specifying
-        the parameters for the callable. For example, a resize augmentation would specify the target
+        Transforms should be defined as a callable class with an initialization function specifying
+        the parameters for the callable. For example, a resize transform would specify the target
         X and Y shapes, if it is for an image.
 
         Note that the callable function should always accept a dictionary, as that is the preferred unit
