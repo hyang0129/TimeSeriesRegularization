@@ -8,7 +8,7 @@ from tqdm.autonotebook import tqdm
 import tensorflow as tf
 from loguru import logger
 import pyreadr as py
-from sklearn.model_selection import train_test_split, KFold
+from sklearn.model_selection import KFold
 from tsr.utils import shell_exec
 
 
