@@ -2,9 +2,6 @@ import tensorflow as tf
 
 from tsr.models.attention import EncoderLayer
 
-tfk = tf.keras
-tfkl = tf.keras.layers
-
 
 def get_mhsa_model(
     strategy: tf.distribute.Strategy,
@@ -15,8 +12,8 @@ def get_mhsa_model(
     num_heads=8,
     d_model=512,
     dff=512,
-    output: tfkl.Layer = tfkl.Dense(1, activation="sigmoid"),
-) -> tfk.Model:
+    output: tf.keras.layers.Layer = tf.keras.layers.Dense(1, activation="sigmoid"),
+) -> tf.keras.Model:
     """
 
     Constructs a Conv-MHSA model, with default settings configured for the IAAI 2022 Paper.
@@ -37,38 +34,38 @@ def get_mhsa_model(
     """
     with strategy.scope():
 
-        model = tfk.Sequential(
+        model = tf.keras.Sequential(
             [
                 tf.keras.Input(shape=input_shape),
-                tfkl.Conv1D(
+                tf.keras.layers.Conv1D(
                     filters=conv_filters[0],
                     kernel_size=kernel[0],
                     strides=strides[0],
                     padding="same",
                     activation="relu",
                 ),
-                tfkl.Conv1D(
+                tf.keras.layers.Conv1D(
                     filters=conv_filters[1],
                     kernel_size=kernel[1],
                     strides=strides[1],
                     padding="same",
                     activation="relu",
                 ),
-                tfkl.Conv1D(
+                tf.keras.layers.Conv1D(
                     filters=conv_filters[2],
                     kernel_size=kernel[2],
                     strides=strides[2],
                     padding="same",
                     activation="relu",
                 ),
-                tfkl.Conv1D(
+                tf.keras.layers.Conv1D(
                     filters=conv_filters[3],
                     kernel_size=kernel[3],
                     strides=strides[3],
                     padding="same",
                     activation="relu",
                 ),
-                tfkl.Conv1D(
+                tf.keras.layers.Conv1D(
                     filters=conv_filters[4],
                     kernel_size=kernel[4],
                     strides=strides[4],
