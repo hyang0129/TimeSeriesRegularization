@@ -13,3 +13,4 @@ pyyaml>=6.0.0
 schema
 loguru
 pyreadr
+keras==2.6.0
