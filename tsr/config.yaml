@@ -5,6 +5,7 @@ hyperparameters:
   batch_size: 32
   training_epochs: 30
   training_steps_per_epoch: 500
+  shuffle_buffer: 1024
 model:
   architecture_name: conv_mhsa
   input_shape: [4096, 23]
