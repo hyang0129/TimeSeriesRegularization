@@ -108,7 +108,7 @@ class Config(UserDict):
         """
 
         path = os.path.join(os.path.dirname(cls.configpypath), "configs", config_name)
-        return cls(path_to_config = path)
+        return cls(path_to_config=path)
 
 
 class AttrDict(dict):
