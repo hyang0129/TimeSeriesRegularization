@@ -78,7 +78,14 @@ class TEP_DatasetManager(DatasetManager):
     def get_tep_data_as_dataframe(cls):
 
         if os.path.exists(cls.cache_name):
-            df = pd.read_csv(cls.dataframe_disk_name)
+            df_test = pd.read_csv(cls.dataframe_disk_name, nrows = 100)
+
+            float_cols = [c for c in df_test if df_test[c].dtype == "float64"]
+            float32_cols = {c: np.float16 for c in float_cols}
+
+            logger.debug("Reading Full Dataframe")
+            df = pd.read_csv(cls.dataframe_disk_name, engine = "c", dtype = float32_cols)
+
             scaler = load(cls.cache_name)
 
         else:
