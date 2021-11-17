@@ -18,8 +18,8 @@ import os
 class TEP_DatasetManager(DatasetManager):
     url = "https://drive.google.com/uc?id=1m6Gkp2tNnnlAzaAVLaWnC2TtXNX2wJV8"
     num_examples = 10500
-    cache_name = 'TEP_Cache.gz'
-    dataframe_disk_name = 'TEP_data.csv'
+    cache_name = "TEP_Cache.gz"
+    dataframe_disk_name = "TEP_data.csv"
 
     def __init__(self, config: Config):
         self.config = config
@@ -34,7 +34,7 @@ class TEP_DatasetManager(DatasetManager):
 
         ds = ds.shuffle(self.config.hyperparameters.shuffle_buffer) if shuffle else ds
         ds = ds.repeat() if repeat else ds
-        ds = ds.batch(self.config.hyperparameters.batch_size, drop_remainder = True)
+        ds = ds.batch(self.config.hyperparameters.batch_size, drop_remainder=True)
 
         if aug:
             logger.debug("Adding Augmentations when Preparing Dataset")
@@ -43,7 +43,7 @@ class TEP_DatasetManager(DatasetManager):
             # ds = ds.map(batch_aug)
 
         desired_input_shape = [self.config.hyperparameters.batch_size] + list(self.config.model.input_shape)
-        ds = ds.map(Reshaper(input_shape = desired_input_shape))
+        ds = ds.map(Reshaper(input_shape=desired_input_shape))
         ds = ds.map(lambda example: (example["input"], example["target"]))
         if self.config.hyperparameters.num_class > 2:
             ds = ds.map(lambda x, y: (x, tf.one_hot(tf.cast(y, tf.int32), self.config.hyperparameters.num_class)))
@@ -78,16 +78,17 @@ class TEP_DatasetManager(DatasetManager):
     def get_tep_data_as_dataframe(cls):
 
         if os.path.exists(cls.cache_name):
-            df_test = pd.read_csv(cls.dataframe_disk_name, nrows = 100)
+            logger.debug("Retrieving Cached Data on Disk")
+            df_test = pd.read_csv(cls.dataframe_disk_name, nrows=100)
 
             float_cols = [c for c in df_test if df_test[c].dtype == "float64"]
             float32_cols = {c: np.float16 for c in float_cols}
 
-            logger.debug("Reading Full Dataframe")
-            df = pd.read_csv(cls.dataframe_disk_name, engine = "c", dtype = float32_cols)
+            logger.debug("Reading Full Dataframe from Disk")
+            df = pd.read_csv(cls.dataframe_disk_name, engine="c", dtype=float32_cols)
 
             scaler = load(cls.cache_name)
-
+            logger.debug("Retrieved Data as Dataframe")
         else:
             output = "tep_dataset.zip"
             gdown.download(cls.url, output, quiet=False)
@@ -118,9 +119,11 @@ class TEP_DatasetManager(DatasetManager):
             scaler = preprocessing.MinMaxScaler()
             scaler.fit(df.iloc[:, 3:55][df.split == "train"].values)
 
-            df.to_csv(cls.dataframe_disk_name, index = False)
+            logger.debug("Writing Data to Disk")
+            df.to_csv(cls.dataframe_disk_name, index=False)
             dump(scaler, cls.cache_name)
 
+            logger.debug("Retrieved Data as Dataframe")
         return df, scaler
 
     @classmethod
@@ -163,7 +166,7 @@ class TEP_DatasetManager(DatasetManager):
         train_splits = []
 
         np.random.seed(42)
-        indices = np.array([i + 1 for i in range(50)])
+        indices = np.array([i + 1 for i in range(10500)])
 
         np.random.shuffle(indices)
 
