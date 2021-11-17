@@ -21,6 +21,7 @@ class Config(UserDict):
             "model": {
                 "architecture_name": And(Use(str), str),
                 "input_shape": And(Use(list), list, lambda x: len(x) == 2, lambda x: all([type(v) is int for v in x])),
+                Optional(object): object,
             },
             "augment": {
                 "random_shift": {

@@ -1,9 +1,29 @@
 import tensorflow as tf
 
 from tsr.models.attention import EncoderLayer
-
+from tsr import Config
 
 class ConvMHSA(tf.keras.Sequential):
+
+    @classmethod
+    def from_config(cls, config:Config):
+
+        if config.hyperparameters.num_classes > 2:
+            output = tf.keras.layers.Dense(config.hyperparameters.num_classes, activation = "softmax")
+        else:
+            output = tf.keras.layers.Dense(1, activation = "sigmoid"),
+
+        mc = config.model
+        return cls(
+            input_shape=mc.input_shape,
+            conv_filters=mc.conv_filters,
+            kernel=mc.kernel,
+            strides=mc.strides,
+            num_heads=mc.num_heads,
+            d_model=mc.d_model,
+            dff=mc.dff,
+            output= output,
+        )
 
     def __init__(self,
         input_shape=(4096, 23),
