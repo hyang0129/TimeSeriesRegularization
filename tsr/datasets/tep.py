@@ -42,7 +42,7 @@ class TEP_DatasetManager(DatasetManager):
             # batch_aug = get_batch_aug()
             # ds = ds.map(batch_aug)
 
-        desired_input_shape = [self.config.hyperparameters.batch_size]
+        desired_input_shape = [self.config.hyperparameters.batch_size] + list(self.config.model.input_shape)
         ds = ds.map(Reshaper(input_shape = desired_input_shape))
         ds = ds.map(lambda example: (example["input"], example["target"]))
         if self.config.hyperparameters.num_class > 2:
