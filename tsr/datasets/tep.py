@@ -166,7 +166,7 @@ class TEP_DatasetManager(DatasetManager):
         train_splits = []
 
         np.random.seed(42)
-        indices = np.array([i + 1 for i in range(10500)])
+        indices = np.array([i + 1 for i in range(self.num_examples)])
 
         np.random.shuffle(indices)
 
