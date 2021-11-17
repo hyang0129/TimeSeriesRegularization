@@ -11,10 +11,15 @@ import pyreadr as py
 from sklearn.model_selection import KFold
 from tsr.utils import shell_exec
 from tsr.datasets.common import Reshaper
+from compress_pickle import dump, load
+import os
+
 
 class TEP_DatasetManager(DatasetManager):
     url = "https://drive.google.com/uc?id=1m6Gkp2tNnnlAzaAVLaWnC2TtXNX2wJV8"
     num_examples = 10500
+    cache_name = 'TEP_Cache.gz'
+    dataframe_disk_name = 'TEP_data.csv'
 
     def __init__(self, config: Config):
         self.config = config
@@ -71,34 +76,43 @@ class TEP_DatasetManager(DatasetManager):
 
     @classmethod
     def get_tep_data_as_dataframe(cls):
-        output = "tep_dataset.zip"
-        gdown.download(cls.url, output, quiet=False)
 
-        shell_exec("unzip -q -n tep_dataset.zip")
+        if os.path.exists(cls.cache_name):
+            df = pd.read_csv(cls.dataframe_disk_name)
+            scaler = load(cls.cache_name)
 
-        # reading train data
-        a1 = py.read_r("TEP_FaultFree_Training.RData")
-        a2 = py.read_r("TEP_Faulty_Training.RData")
-        b1 = cls.fix_column_types(a1["fault_free_training"])
-        b2 = cls.fix_column_types(a2["faulty_training"])
+        else:
+            output = "tep_dataset.zip"
+            gdown.download(cls.url, output, quiet=False)
 
-        # reading test data
-        a3 = py.read_r("TEP_FaultFree_Testing.RData")
-        a4 = py.read_r("TEP_Faulty_Testing.RData")
-        b3 = cls.fix_column_types(a3["fault_free_testing"])
-        b4 = cls.fix_column_types(a4["faulty_testing"])
+            shell_exec("unzip -q -n tep_dataset.zip")
 
-        b1["split"] = "train"
-        b2["split"] = "train"
-        b3["split"] = "test"
-        b4["split"] = "test"
+            # reading train data
+            a1 = py.read_r("TEP_FaultFree_Training.RData")
+            a2 = py.read_r("TEP_Faulty_Training.RData")
+            b1 = cls.fix_column_types(a1["fault_free_training"])
+            b2 = cls.fix_column_types(a2["faulty_training"])
 
-        df = pd.concat([b1, b2, b3, b4])
+            # reading test data
+            a3 = py.read_r("TEP_FaultFree_Testing.RData")
+            a4 = py.read_r("TEP_Faulty_Testing.RData")
+            b3 = cls.fix_column_types(a3["fault_free_testing"])
+            b4 = cls.fix_column_types(a4["faulty_testing"])
 
-        df["id"] = df.faultNumber.apply(lambda x: int(x)) + df.simulationRun.apply(lambda x: int(x) * 100)
+            b1["split"] = "train"
+            b2["split"] = "train"
+            b3["split"] = "test"
+            b4["split"] = "test"
 
-        scaler = preprocessing.MinMaxScaler()
-        scaler.fit(df.iloc[:, 3:55][df.split == "train"].values)
+            df = pd.concat([b1, b2, b3, b4])
+
+            df["id"] = df.faultNumber.apply(lambda x: int(x)) + df.simulationRun.apply(lambda x: int(x) * 100)
+
+            scaler = preprocessing.MinMaxScaler()
+            scaler.fit(df.iloc[:, 3:55][df.split == "train"].values)
+
+            df.to_csv(cls.dataframe_disk_name, index = False)
+            dump(scaler, cls.cache_name)
 
         return df, scaler
 
