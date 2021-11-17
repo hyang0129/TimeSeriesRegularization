@@ -10,7 +10,7 @@ from loguru import logger
 import pyreadr as py
 from sklearn.model_selection import KFold
 from tsr.utils import shell_exec
-
+from tsr.datasets.common import Reshaper
 
 class TEP_DatasetManager(DatasetManager):
     url = "https://drive.google.com/uc?id=1m6Gkp2tNnnlAzaAVLaWnC2TtXNX2wJV8"
@@ -25,6 +25,27 @@ class TEP_DatasetManager(DatasetManager):
         self.test_dataset = self.get_test_dataset_from_dataframe(self.dataframe)
 
     def prepare_tfdataset(self, ds, shuffle: bool = False, repeat: bool = False, aug: bool = False) -> tf.data.Dataset:
+        logger.debug("Preparing basic TF Dataset for Training or Inference Usage")
+
+        ds = ds.shuffle(self.config.hyperparameters.shuffle_buffer) if shuffle else ds
+        ds = ds.repeat() if repeat else ds
+        ds = ds.batch(self.config.hyperparameters.batch_size, drop_remainder = True)
+
+        if aug:
+            logger.debug("Adding Augmentations when Preparing Dataset")
+            pass
+            # batch_aug = get_batch_aug()
+            # ds = ds.map(batch_aug)
+
+        desired_input_shape = [self.config.hyperparameters.batch_size]
+        ds = ds.map(Reshaper(input_shape = desired_input_shape))
+        ds = ds.map(lambda example: (example["input"], example["target"]))
+        if self.config.hyperparameters.num_class > 2:
+            ds = ds.map(lambda x, y: (x, tf.one_hot(tf.cast(y, tf.int32), self.config.hyperparameters.num_class)))
+        else:
+            ds = ds.map(lambda x, y: (x, tf.reshape(y, (self.config.hyperparameters.batch_size, 1))))
+
+        logger.debug("Successfully prepared basic TF Dataset for Training or Inference Usage")
         return ds
 
     def get_train_and_val_for_fold(self, fold: int):
@@ -120,7 +141,14 @@ class TEP_DatasetManager(DatasetManager):
 
         train_splits = []
 
-        for train_split, val_split in KFold(5, shuffle=True, random_state=0).split([i + 1 for i in range(10500)]):
+        np.random.seed(42)
+        indices = np.array([i + 1 for i in range(50)])
+
+        np.random.shuffle(indices)
+
+        for train_split, val_split in KFold(5, shuffle=True, random_state=0).split(indices):
+
+            val_split = indices[val_split]
             ds = tf.data.Dataset.from_tensor_slices(arr[val_split])
             ds = ds.map(lambda x: {"input": x[:, 3:], "target": x[0, 0]})
             train_splits.append(ds)

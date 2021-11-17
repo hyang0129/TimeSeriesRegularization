@@ -92,6 +92,21 @@ class Config(UserDict):
 
         return cls(path_to_config=path)
 
+    @classmethod
+    def get_standard_config(cls, config_name):
+        """
+        Standard configs are stored in the configs folder in the package
+
+        Args:
+            config_name:
+
+        Returns:
+            config object initialized from a standard config file
+        """
+
+        path = os.path.join(os.path.dirname(cls.configpypath), "configs", config_name)
+        return cls(path_to_config = path)
+
 
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
