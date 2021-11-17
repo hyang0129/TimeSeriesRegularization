@@ -14,3 +14,4 @@ schema
 loguru
 pyreadr
 keras==2.6.0
+compress-pickle

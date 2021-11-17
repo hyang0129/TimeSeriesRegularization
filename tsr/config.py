@@ -16,6 +16,7 @@ class Config(UserDict):
                 "batch_size": And(Use(int), int),
                 "training_epochs": And(Use(int), int),
                 "training_steps_per_epoch": And(Use(int), int),
+                "shuffle_buffer" : And(Use(int), int),
             },
             "model": {
                 "architecture_name": And(Use(str), str),
