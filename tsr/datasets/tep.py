@@ -10,11 +10,16 @@ from loguru import logger
 import pyreadr as py
 from sklearn.model_selection import KFold
 from tsr.utils import shell_exec
+from tsr.datasets.common import Reshaper
+from compress_pickle import dump, load
+import os
 
 
 class TEP_DatasetManager(DatasetManager):
     url = "https://drive.google.com/uc?id=1m6Gkp2tNnnlAzaAVLaWnC2TtXNX2wJV8"
     num_examples = 10500
+    cache_name = "TEP_Cache.gz"
+    dataframe_disk_name = "TEP_data.csv"
 
     def __init__(self, config: Config):
         self.config = config
@@ -25,6 +30,27 @@ class TEP_DatasetManager(DatasetManager):
         self.test_dataset = self.get_test_dataset_from_dataframe(self.dataframe)
 
     def prepare_tfdataset(self, ds, shuffle: bool = False, repeat: bool = False, aug: bool = False) -> tf.data.Dataset:
+        logger.debug("Preparing basic TF Dataset for Training or Inference Usage")
+
+        ds = ds.shuffle(self.config.hyperparameters.shuffle_buffer) if shuffle else ds
+        ds = ds.repeat() if repeat else ds
+        ds = ds.batch(self.config.hyperparameters.batch_size, drop_remainder=True)
+
+        if aug:
+            logger.debug("Adding Augmentations when Preparing Dataset")
+            pass
+            # batch_aug = get_batch_aug()
+            # ds = ds.map(batch_aug)
+
+        desired_input_shape = [self.config.hyperparameters.batch_size] + list(self.config.model.input_shape)
+        ds = ds.map(Reshaper(input_shape=desired_input_shape))
+        ds = ds.map(lambda example: (example["input"], example["target"]))
+        if self.config.hyperparameters.num_class > 2:
+            ds = ds.map(lambda x, y: (x, tf.one_hot(tf.cast(y, tf.int32), self.config.hyperparameters.num_class)))
+        else:
+            ds = ds.map(lambda x, y: (x, tf.reshape(y, (self.config.hyperparameters.batch_size, 1))))
+
+        logger.debug("Successfully prepared basic TF Dataset for Training or Inference Usage")
         return ds
 
     def get_train_and_val_for_fold(self, fold: int):
@@ -50,35 +76,54 @@ class TEP_DatasetManager(DatasetManager):
 
     @classmethod
     def get_tep_data_as_dataframe(cls):
-        output = "tep_dataset.zip"
-        gdown.download(cls.url, output, quiet=False)
 
-        shell_exec("unzip -q -n tep_dataset.zip")
+        if os.path.exists(cls.cache_name):
+            logger.debug("Retrieving Cached Data on Disk")
+            df_test = pd.read_csv(cls.dataframe_disk_name, nrows=100)
 
-        # reading train data
-        a1 = py.read_r("TEP_FaultFree_Training.RData")
-        a2 = py.read_r("TEP_Faulty_Training.RData")
-        b1 = cls.fix_column_types(a1["fault_free_training"])
-        b2 = cls.fix_column_types(a2["faulty_training"])
+            float_cols = [c for c in df_test if df_test[c].dtype == "float64"]
+            float32_cols = {c: np.float16 for c in float_cols}
 
-        # reading test data
-        a3 = py.read_r("TEP_FaultFree_Testing.RData")
-        a4 = py.read_r("TEP_Faulty_Testing.RData")
-        b3 = cls.fix_column_types(a3["fault_free_testing"])
-        b4 = cls.fix_column_types(a4["faulty_testing"])
+            logger.debug("Reading Full Dataframe from Disk")
+            df = pd.read_csv(cls.dataframe_disk_name, engine="c", dtype=float32_cols)
 
-        b1["split"] = "train"
-        b2["split"] = "train"
-        b3["split"] = "test"
-        b4["split"] = "test"
+            scaler = load(cls.cache_name)
+            logger.debug("Retrieved Data as Dataframe")
+        else:
+            output = "tep_dataset.zip"
+            gdown.download(cls.url, output, quiet=False)
 
-        df = pd.concat([b1, b2, b3, b4])
+            shell_exec("unzip -q -n tep_dataset.zip")
 
-        df["id"] = df.faultNumber.apply(lambda x: int(x)) + df.simulationRun.apply(lambda x: int(x) * 100)
+            # reading train data
+            a1 = py.read_r("TEP_FaultFree_Training.RData")
+            a2 = py.read_r("TEP_Faulty_Training.RData")
+            b1 = cls.fix_column_types(a1["fault_free_training"])
+            b2 = cls.fix_column_types(a2["faulty_training"])
 
-        scaler = preprocessing.MinMaxScaler()
-        scaler.fit(df.iloc[:, 3:55][df.split == "train"].values)
+            # reading test data
+            a3 = py.read_r("TEP_FaultFree_Testing.RData")
+            a4 = py.read_r("TEP_Faulty_Testing.RData")
+            b3 = cls.fix_column_types(a3["fault_free_testing"])
+            b4 = cls.fix_column_types(a4["faulty_testing"])
 
+            b1["split"] = "train"
+            b2["split"] = "train"
+            b3["split"] = "test"
+            b4["split"] = "test"
+
+            df = pd.concat([b1, b2, b3, b4])
+
+            df["id"] = df.faultNumber.apply(lambda x: int(x)) + df.simulationRun.apply(lambda x: int(x) * 100)
+
+            scaler = preprocessing.MinMaxScaler()
+            scaler.fit(df.iloc[:, 3:55][df.split == "train"].values)
+
+            logger.debug("Writing Data to Disk")
+            df.to_csv(cls.dataframe_disk_name, index=False)
+            dump(scaler, cls.cache_name)
+
+            logger.debug("Retrieved Data as Dataframe")
         return df, scaler
 
     @classmethod
@@ -120,7 +165,14 @@ class TEP_DatasetManager(DatasetManager):
 
         train_splits = []
 
-        for train_split, val_split in KFold(5, shuffle=True, random_state=0).split([i + 1 for i in range(10500)]):
+        np.random.seed(42)
+        indices = np.array([i for i in range(self.num_examples)])
+
+        np.random.shuffle(indices)
+
+        for train_split, val_split in KFold(5, shuffle=True, random_state=0).split(indices):
+
+            val_split = indices[val_split]
             ds = tf.data.Dataset.from_tensor_slices(arr[val_split])
             ds = ds.map(lambda x: {"input": x[:, 3:], "target": x[0, 0]})
             train_splits.append(ds)

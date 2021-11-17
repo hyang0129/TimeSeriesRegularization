@@ -16,6 +16,7 @@ class Config(UserDict):
                 "batch_size": And(Use(int), int),
                 "training_epochs": And(Use(int), int),
                 "training_steps_per_epoch": And(Use(int), int),
+                "shuffle_buffer": And(Use(int), int),
             },
             "model": {
                 "architecture_name": And(Use(str), str),
@@ -83,6 +84,7 @@ class Config(UserDict):
         """
         We expect the default config to be stored alongside the config.py
 
+        TODO: Deprecate this you really shouldn't have it
 
         Returns:
             a config object initialized from the default config file
@@ -90,6 +92,21 @@ class Config(UserDict):
 
         path = os.path.join(os.path.dirname(cls.configpypath), "config.yaml")
 
+        return cls(path_to_config=path)
+
+    @classmethod
+    def get_standard_config(cls, config_name):
+        """
+        Standard configs are stored in the configs folder in the package
+
+        Args:
+            config_name:
+
+        Returns:
+            config object initialized from a standard config file
+        """
+
+        path = os.path.join(os.path.dirname(cls.configpypath), "configs", config_name)
         return cls(path_to_config=path)
 
 

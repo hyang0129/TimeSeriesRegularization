@@ -65,7 +65,7 @@ class NGAFID_DatasetManager:
     def prepare_tfdataset(self, ds, shuffle: bool = False, repeat: bool = False, aug: bool = False) -> tf.data.Dataset:
         logger.debug("Preparing basic TF Dataset for Training or Inference Usage")
 
-        ds = ds.shuffle(self.config.hyperparameters.truncate_last_timesteps) if shuffle else ds
+        ds = ds.shuffle(self.config.hyperparameters.shuffle_buffer) if shuffle else ds
         ds = ds.repeat() if repeat else ds
         ds = ds.batch(self.config.hyperparameters.batch_size, drop_remainder=True)
         ds = ds.map(RandomShifter.from_config(self.config))
