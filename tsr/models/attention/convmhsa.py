@@ -8,8 +8,8 @@ class ConvMHSA(tf.keras.Sequential):
     @classmethod
     def from_config(cls, config: Config):
 
-        if config.hyperparameters.num_classes > 2:
-            output = tf.keras.layers.Dense(config.hyperparameters.num_classes, activation="softmax")
+        if config.hyperparameters.num_class > 2:
+            output = tf.keras.layers.Dense(config.hyperparameters.num_class, activation="softmax")
         else:
             output = (tf.keras.layers.Dense(1, activation="sigmoid"),)
 
