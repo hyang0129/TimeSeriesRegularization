@@ -3,4 +3,4 @@ from tsr.models.attention.common import (
     point_wise_feed_forward_network,
 )
 from tsr.models.attention.mhsa import MultiHeadAttention, EncoderLayer
-from tsr.models.attention.convmhsa import get_mhsa_model
+from tsr.models.attention.convmhsa import ConvMHSA
