@@ -9,7 +9,7 @@ hyperparameters:
 
 model:
   sub_config_path: model/conv_mhsa_tep.yaml
-
+  
 augment:
   random_shift:
     backward: 32
