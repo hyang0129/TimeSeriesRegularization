@@ -7,6 +7,7 @@ import os
 import inspect
 from loguru import logger
 
+
 class Config(UserDict):
 
     schema = Schema(
@@ -70,8 +71,7 @@ class Config(UserDict):
 
         self.yaml_contents = self.schema.validate(self.yaml_contents)
 
-
-    def as_attr_dict(self, check = True):
+    def as_attr_dict(self, check=True):
         """
         Allows access of values as attributes, making code more readable and/or easier to type.
 
@@ -86,7 +86,8 @@ class Config(UserDict):
         for k in self.keys():
             if check:
                 assert not hasattr(self.__class__, k), (
-                    "A config top level section has the same name as an existing attribute of the config class. See %s" % k
+                    "A config top level section has the same name as an existing attribute of the config class. See %s"
+                    % k
                 )
             setattr(self, k, attrdict[k])
 
@@ -120,23 +121,22 @@ class Config(UserDict):
         path = os.path.join(os.path.dirname(cls.configpypath), "configs", config_name)
         return cls(path_to_config=path)
 
-    def merge_config(self, config : Config):
+    def merge_config(self, config: Config):
         self.update(config)
 
     def collect_sub_configs(self):
-        for k,v in self.items():
+        for k, v in self.items():
 
             try:
-                sub_config_path = self[k]['sub_config_path']
+                sub_config_path = self[k]["sub_config_path"]
                 sub_config_path = os.path.join(self.config_dir, sub_config_path)
                 sub_config = Config(sub_config_path)
 
                 self.merge_config(sub_config)
-                logger.info('Added Subconfig for %s from %s' % (k, sub_config_path))
+                logger.info("Added Subconfig for %s from %s" % (k, sub_config_path))
 
             except KeyError:
-                logger.debug('Sub Config Not Specified for %s config group' % k)
-
+                logger.debug("Sub Config Not Specified for %s config group" % k)
 
     def update(self, *args, **kwargs):
         super().update(*args, **kwargs)
@@ -162,8 +162,7 @@ class AttrDict(dict):
 
 if __name__ == "__main__":
     # c = Config()
-    c = Config.get_standard_config('TEP.yaml')
-
+    c = Config.get_standard_config("TEP.yaml")
 
     # c.model = 'abc'
     # c.__dict__['model'] = 'abc'

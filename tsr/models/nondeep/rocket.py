@@ -1,5 +1,4 @@
-class ROCKET():
-
+class ROCKET:
     @classmethod
     def from_config(cls):
         raise NotImplementedError
