@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from collections import UserDict
 from yaml import load, FullLoader
 from schema import Schema, And, Use, Optional
 import os
 import inspect
-
+from loguru import logger
 
 class Config(UserDict):
 
@@ -48,9 +50,15 @@ class Config(UserDict):
         """
 
         self.yaml_contents = load(open(path_to_config, "r").read(), Loader=FullLoader)
-        self.validate_yaml()
+        self.path_to_config = path_to_config
+        self.config_dir = os.path.dirname(path_to_config)
+
+        # Skip validation for now
+        # self.validate_yaml()
         super(Config, self).__init__(self.yaml_contents)
-        self.as_attr_dict()
+        self.collect_sub_configs()
+
+        logger.debug(self.data)
 
     def validate_yaml(self):
         """
@@ -62,7 +70,8 @@ class Config(UserDict):
 
         self.yaml_contents = self.schema.validate(self.yaml_contents)
 
-    def as_attr_dict(self):
+
+    def as_attr_dict(self, check = True):
         """
         Allows access of values as attributes, making code more readable and/or easier to type.
 
@@ -75,9 +84,10 @@ class Config(UserDict):
         attrdict = AttrDict.from_nested_dicts(self)
 
         for k in self.keys():
-            assert not hasattr(self, k), (
-                "A config top level section has the same name as an existing attribute of the config class. See %s" % k
-            )
+            if check:
+                assert not hasattr(self.__class__, k), (
+                    "A config top level section has the same name as an existing attribute of the config class. See %s" % k
+                )
             setattr(self, k, attrdict[k])
 
     @classmethod
@@ -110,6 +120,28 @@ class Config(UserDict):
         path = os.path.join(os.path.dirname(cls.configpypath), "configs", config_name)
         return cls(path_to_config=path)
 
+    def merge_config(self, config : Config):
+        self.update(config)
+
+    def collect_sub_configs(self):
+        for k,v in self.items():
+
+            try:
+                sub_config_path = self[k]['sub_config_path']
+                sub_config_path = os.path.join(self.config_dir, sub_config_path)
+                sub_config = Config(sub_config_path)
+
+                self.merge_config(sub_config)
+                logger.info('Added Subconfig for %s from %s' % (k, sub_config_path))
+
+            except KeyError:
+                logger.debug('Sub Config Not Specified for %s config group' % k)
+
+
+    def update(self, *args, **kwargs):
+        super().update(*args, **kwargs)
+        self.as_attr_dict()
+
 
 class AttrDict(dict):
     def __init__(self, *args, **kwargs):
@@ -129,5 +161,13 @@ class AttrDict(dict):
 
 
 if __name__ == "__main__":
-    c = Config()
-    print(c.model)
+    # c = Config()
+    c = Config.get_standard_config('TEP.yaml')
+
+
+    # c.model = 'abc'
+    # c.__dict__['model'] = 'abc'
+    # c['model'] = 'abc'
+
+    # print(c.model)
+    # print(c['model'])

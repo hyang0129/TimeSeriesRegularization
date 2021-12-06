@@ -1,4 +1,6 @@
+# noqa
 import subprocess
+
 
 def shell_exec(command_as_string):
     """
