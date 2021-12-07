@@ -13,13 +13,14 @@ from tsr.utils import shell_exec
 from tsr.datasets.common import Reshaper
 from compress_pickle import dump, load
 import os
-
+import gc
 
 class TEP_DatasetManager(DatasetManager):
     url = "https://drive.google.com/uc?id=1m6Gkp2tNnnlAzaAVLaWnC2TtXNX2wJV8"
+    parquet_url = 'https://drive.google.com/uc?id=1pKuiQ9faJAsP2pYPMzDTt2YrsbHsETYQ'
     num_examples = 10500
     cache_name = "TEP_Cache.gz"
-    dataframe_disk_name = "TEP_data.csv"
+    dataframe_disk_name = "TEP_data.parquet"
 
     def __init__(self, config: Config):
         self.config = config
@@ -75,21 +76,9 @@ class TEP_DatasetManager(DatasetManager):
         return train_ds, val_ds
 
     @classmethod
-    def get_tep_data_as_dataframe(cls):
+    def get_tep_data_as_dataframe(cls, process_raw_rdata = False):
 
-        if os.path.exists(cls.cache_name):
-            logger.debug("Retrieving Cached Data on Disk")
-            df_test = pd.read_csv(cls.dataframe_disk_name, nrows=100)
-
-            float_cols = [c for c in df_test if df_test[c].dtype == "float64"]
-            float32_cols = {c: np.float16 for c in float_cols}
-
-            logger.debug("Reading Full Dataframe from Disk")
-            df = pd.read_csv(cls.dataframe_disk_name, engine="c", dtype=float32_cols)
-
-            scaler = load(cls.cache_name)
-            logger.debug("Retrieved Data as Dataframe")
-        else:
+        if process_raw_rdata:
             output = "tep_dataset.zip"
             gdown.download(cls.url, output, quiet=False)
             logger.debug('Downloaded Data')
@@ -103,6 +92,10 @@ class TEP_DatasetManager(DatasetManager):
             logger.debug('Fixing Column Types')
             b1 = cls.fix_column_types(a1["fault_free_training"])
             b2 = cls.fix_column_types(a2["faulty_training"])
+
+            a1 = None
+            a2 = None
+            gc.collect()
 
             logger.debug('Reading Testing Data')
             a3 = py.read_r("TEP_FaultFree_Testing.RData")
@@ -125,10 +118,27 @@ class TEP_DatasetManager(DatasetManager):
             scaler.fit(df.iloc[:, 3:55][df.split == "train"].values)
 
             logger.debug("Writing Data to Disk")
-            df.to_csv(cls.dataframe_disk_name, index=False)
+
+            df.to_parquet(cls.dataframe_disk_name)
             dump(scaler, cls.cache_name)
 
             logger.debug("Retrieved Data as Dataframe")
+
+        else:
+            logger.debug("Downloading Parquet")
+
+            gdown.download(cls.parquet_url, cls.dataframe_disk_name, quiet = False)
+
+            logger.debug("Reading Full Dataframe from Disk")
+
+            df = pd.read_parquet(cls.dataframe_disk_name)
+
+            logger.debug("Retrieved Data as Dataframe")
+
+            logger.debug('Fitting Scaler')
+            scaler = preprocessing.MinMaxScaler()
+            scaler.fit(df.iloc[:, 3:55][df.split == "train"].values)
+
         return df, scaler
 
     @classmethod
