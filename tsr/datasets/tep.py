@@ -17,12 +17,21 @@ import gc
 
 class TEP_DatasetManager(DatasetManager):
     url = "https://drive.google.com/uc?id=1m6Gkp2tNnnlAzaAVLaWnC2TtXNX2wJV8"
-    parquet_url = "https://drive.google.com/uc?id=1pKuiQ9faJAsP2pYPMzDTt2YrsbHsETYQ"
+    parquet_url = "https://drive.google.com/uc?id=1--5ItWe4axeZofryEKOwlITBuYFwOO-P"
+
     num_examples = 10500
     cache_name = "TEP_Cache.gz"
     dataframe_disk_name = "TEP_data.parquet"
 
     def __init__(self, config: Config):
+        '''
+        By default, downloads the parquet version of the TEP dataset. You can manually process the RData files
+        if you want using the get_tep_data_as_dataframe method.
+
+        Args:
+            config:
+        '''
+
         self.config = config
         self.dataframe, self.scaler = self.get_tep_data_as_dataframe()
         self.dataframe = self.apply_scaler(self.dataframe, self.scaler)
@@ -117,7 +126,7 @@ class TEP_DatasetManager(DatasetManager):
             df["id"] = df.faultNumber.apply(lambda x: int(x)) + df.simulationRun.apply(lambda x: int(x) * 100)
 
             scaler = preprocessing.MinMaxScaler()
-            scaler.fit(df.iloc[:, 3:55][df.split == "train"].values)
+            scaler.fit(df.iloc[:, 3:55][df.split == "train"].sample(1000000, random_state = 0).values)
 
             logger.debug("Writing Data to Disk")
 
@@ -139,7 +148,7 @@ class TEP_DatasetManager(DatasetManager):
 
             logger.debug("Fitting Scaler")
             scaler = preprocessing.MinMaxScaler()
-            scaler.fit(df.iloc[:, 3:55][df.split == "train"].values)
+            scaler.fit(df.iloc[:, 3:55][df.split == "train"].sample(1000000, random_state = 0).values)
 
         return df, scaler
 
