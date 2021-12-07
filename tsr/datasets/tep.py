@@ -92,16 +92,18 @@ class TEP_DatasetManager(DatasetManager):
         else:
             output = "tep_dataset.zip"
             gdown.download(cls.url, output, quiet=False)
+            logger.debug('Downloaded Data')
 
             shell_exec("unzip -q -n tep_dataset.zip")
+            logger.debug('Unzipped Data')
 
-            # reading train data
+            logger.debug('Reading Training Data')
             a1 = py.read_r("TEP_FaultFree_Training.RData")
             a2 = py.read_r("TEP_Faulty_Training.RData")
             b1 = cls.fix_column_types(a1["fault_free_training"])
             b2 = cls.fix_column_types(a2["faulty_training"])
 
-            # reading test data
+            logger.debug('Reading Testing Data')
             a3 = py.read_r("TEP_FaultFree_Testing.RData")
             a4 = py.read_r("TEP_Faulty_Testing.RData")
             b3 = cls.fix_column_types(a3["fault_free_testing"])
