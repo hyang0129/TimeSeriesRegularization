@@ -100,12 +100,14 @@ class TEP_DatasetManager(DatasetManager):
             logger.debug('Reading Training Data')
             a1 = py.read_r("TEP_FaultFree_Training.RData")
             a2 = py.read_r("TEP_Faulty_Training.RData")
+            logger.debug('Fixing Column Types')
             b1 = cls.fix_column_types(a1["fault_free_training"])
             b2 = cls.fix_column_types(a2["faulty_training"])
 
             logger.debug('Reading Testing Data')
             a3 = py.read_r("TEP_FaultFree_Testing.RData")
             a4 = py.read_r("TEP_Faulty_Testing.RData")
+            logger.debug('Fixing Column Types')
             b3 = cls.fix_column_types(a3["fault_free_testing"])
             b4 = cls.fix_column_types(a4["faulty_testing"])
 
@@ -114,6 +116,7 @@ class TEP_DatasetManager(DatasetManager):
             b3["split"] = "test"
             b4["split"] = "test"
 
+            logger.debug('Combining Data')
             df = pd.concat([b1, b2, b3, b4])
 
             df["id"] = df.faultNumber.apply(lambda x: int(x)) + df.simulationRun.apply(lambda x: int(x) * 100)
