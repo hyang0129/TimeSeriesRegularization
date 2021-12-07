@@ -79,6 +79,8 @@ class TEP_DatasetManager(DatasetManager):
     def get_tep_data_as_dataframe(cls, process_raw_rdata=False):
 
         if process_raw_rdata:
+            logger.warning('You need a lot of RAM to read the RDATA file. At least 32GB')
+
             output = "tep_dataset.zip"
             gdown.download(cls.url, output, quiet=False)
             logger.debug("Downloaded Data")
