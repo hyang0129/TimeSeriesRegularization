@@ -34,7 +34,7 @@ class TEP_DatasetManager(DatasetManager):
 
         self.config = config
         self.dataframe, self.scaler = self.get_tep_data_as_dataframe()
-        self.dataframe = self.apply_scaler(self.dataframe, self.scaler)
+        # self.dataframe = self.apply_scaler(self.dataframe, self.scaler)
 
         # self.folded_datasets = self.get_split_train_dataset_from_dataframe(self.dataframe)
         # self.test_dataset = self.get_test_dataset_from_dataframe(self.dataframe)
