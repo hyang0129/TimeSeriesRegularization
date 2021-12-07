@@ -11,13 +11,13 @@ import pyreadr as py
 from sklearn.model_selection import KFold
 from tsr.utils import shell_exec
 from tsr.datasets.common import Reshaper
-from compress_pickle import dump, load
-import os
+from compress_pickle import dump
 import gc
+
 
 class TEP_DatasetManager(DatasetManager):
     url = "https://drive.google.com/uc?id=1m6Gkp2tNnnlAzaAVLaWnC2TtXNX2wJV8"
-    parquet_url = 'https://drive.google.com/uc?id=1pKuiQ9faJAsP2pYPMzDTt2YrsbHsETYQ'
+    parquet_url = "https://drive.google.com/uc?id=1pKuiQ9faJAsP2pYPMzDTt2YrsbHsETYQ"
     num_examples = 10500
     cache_name = "TEP_Cache.gz"
     dataframe_disk_name = "TEP_data.parquet"
@@ -76,20 +76,20 @@ class TEP_DatasetManager(DatasetManager):
         return train_ds, val_ds
 
     @classmethod
-    def get_tep_data_as_dataframe(cls, process_raw_rdata = False):
+    def get_tep_data_as_dataframe(cls, process_raw_rdata=False):
 
         if process_raw_rdata:
             output = "tep_dataset.zip"
             gdown.download(cls.url, output, quiet=False)
-            logger.debug('Downloaded Data')
+            logger.debug("Downloaded Data")
 
             shell_exec("unzip -q -n tep_dataset.zip")
-            logger.debug('Unzipped Data')
+            logger.debug("Unzipped Data")
 
-            logger.debug('Reading Training Data')
+            logger.debug("Reading Training Data")
             a1 = py.read_r("TEP_FaultFree_Training.RData")
             a2 = py.read_r("TEP_Faulty_Training.RData")
-            logger.debug('Fixing Column Types')
+            logger.debug("Fixing Column Types")
             b1 = cls.fix_column_types(a1["fault_free_training"])
             b2 = cls.fix_column_types(a2["faulty_training"])
 
@@ -97,10 +97,10 @@ class TEP_DatasetManager(DatasetManager):
             a2 = None
             gc.collect()
 
-            logger.debug('Reading Testing Data')
+            logger.debug("Reading Testing Data")
             a3 = py.read_r("TEP_FaultFree_Testing.RData")
             a4 = py.read_r("TEP_Faulty_Testing.RData")
-            logger.debug('Fixing Column Types')
+            logger.debug("Fixing Column Types")
             b3 = cls.fix_column_types(a3["fault_free_testing"])
             b4 = cls.fix_column_types(a4["faulty_testing"])
 
@@ -109,7 +109,7 @@ class TEP_DatasetManager(DatasetManager):
             b3["split"] = "test"
             b4["split"] = "test"
 
-            logger.debug('Combining Data')
+            logger.debug("Combining Data")
             df = pd.concat([b1, b2, b3, b4])
 
             df["id"] = df.faultNumber.apply(lambda x: int(x)) + df.simulationRun.apply(lambda x: int(x) * 100)
@@ -125,9 +125,9 @@ class TEP_DatasetManager(DatasetManager):
             logger.debug("Retrieved Data as Dataframe")
 
         else:
-            logger.debug("Downloading Parquet")
+            logger.info("Downloading Parquet")
 
-            gdown.download(cls.parquet_url, cls.dataframe_disk_name, quiet = False)
+            gdown.download(cls.parquet_url, cls.dataframe_disk_name, quiet=False)
 
             logger.debug("Reading Full Dataframe from Disk")
 
@@ -135,7 +135,7 @@ class TEP_DatasetManager(DatasetManager):
 
             logger.debug("Retrieved Data as Dataframe")
 
-            logger.debug('Fitting Scaler')
+            logger.debug("Fitting Scaler")
             scaler = preprocessing.MinMaxScaler()
             scaler.fit(df.iloc[:, 3:55][df.split == "train"].values)
 

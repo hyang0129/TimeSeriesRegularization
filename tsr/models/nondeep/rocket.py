@@ -4,13 +4,16 @@ from sktime.transformations.panel.rocket import Rocket
 import numpy as np
 import tensorflow as tf
 
+
 class ROCKET:
     @classmethod
     def from_config(cls):
         raise NotImplementedError
 
     def __init__(self, num_kernels=20000):
-        self.pipeline = make_pipeline(Rocket(num_kernels=num_kernels), RidgeClassifierCV(alphas=np.logspace(-3, 3, 10), normalize=True))
+        self.pipeline = make_pipeline(
+            Rocket(num_kernels=num_kernels), RidgeClassifierCV(alphas=np.logspace(-3, 3, 10), normalize=True)
+        )
 
     def fit(self, train_dataset, *args, **kwargs):
 
