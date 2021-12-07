@@ -36,7 +36,7 @@ class TEP_DatasetManager(DatasetManager):
         self.dataframe, self.scaler = self.get_tep_data_as_dataframe()
         # self.dataframe = self.apply_scaler(self.dataframe, self.scaler)
 
-        # self.folded_datasets = self.get_split_train_dataset_from_dataframe(self.dataframe)
+        self.folded_datasets = self.get_split_train_dataset_from_dataframe(self.dataframe)
         # self.test_dataset = self.get_test_dataset_from_dataframe(self.dataframe)
 
     def prepare_tfdataset(self, ds, shuffle: bool = False, repeat: bool = False, aug: bool = False) -> tf.data.Dataset:
