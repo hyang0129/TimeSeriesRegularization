@@ -154,11 +154,9 @@ class TEP_DatasetManager(DatasetManager):
 
     @classmethod
     def apply_scaler(cls, df, scaler):
-        arr = df.iloc[:, 3:55].values
-        arr = scaler.transform(arr)
-
-        for i in tqdm(range(52)):
-            df.iloc[:, i + 3] = arr[:, i]
+        n = int(1e6)
+        for i in tqdm(range(int(len(df) / n) + 1)):
+            df.iloc[i * n:(i + 1) * n, 3:55] = scaler.transform(df.iloc[i * n:(i + 1) * n, 3:55])
 
         return df
 
