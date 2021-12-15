@@ -9,6 +9,7 @@ from loguru import logger
 
 import pandas as pd
 import numpy as np
+import tensorflow as tf
 
 
 class UAE_DatasetManager(DatasetManager):
@@ -145,6 +146,11 @@ class UAE_DatasetManager(DatasetManager):
         x_train, y_train = load_from_tsfile_to_dataframe(path)
 
         return x_train, y_train
+
+
+
+    def get_train_and_val_for_fold(self, fold: int) -> (tf.data.Dataset, tf.data.Dataset):
+        raise NotImplementedError
 
     @staticmethod
     def to_numeric_classes(y_train):
