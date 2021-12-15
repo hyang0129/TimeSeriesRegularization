@@ -133,7 +133,7 @@ class UAE_DatasetManager(DatasetManager):
 
     def download_and_unzip(self):
         logger.info('Downloading UAE Archive for Multivariate TS Classification')
-        shell_exec("http://www.timeseriesclassification.com/Downloads/Archives/Multivariate2018_ts.zip")
+        shell_exec("wget http://www.timeseriesclassification.com/Downloads/Archives/Multivariate2018_ts.zip")
         shell_exec("unzip -q -n Multivariate2018_ts.zip")
 
     def get_dataset(self, dataset_name, split="TRAIN", format="TF"):
