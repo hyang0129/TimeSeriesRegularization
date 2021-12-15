@@ -148,11 +148,24 @@ class UAE_DatasetManager(DatasetManager):
 
         x, y = load_from_tsfile_to_dataframe(path)
 
+        max_length = self.get_max_length(x)
+        x = x.applymap(self.get_to_length(max_length))
+
         y = self.to_numeric_classes(y)
         x = self.convert_sktime_format_to_array(x)
 
         return x, y
 
+    @staticmethod
+    def get_to_length(length):
+        def to_length(a):
+            return np.pad(a, (0, np.max(length - len(a), 0)))
+
+        return to_length
+
+    @staticmethod
+    def get_max_length(x):
+        return np.max(x.iloc[:, 0].apply(lambda x: len(x)))
 
 
     def get_train_and_val_for_fold(self, fold: int) -> (tf.data.Dataset, tf.data.Dataset):
