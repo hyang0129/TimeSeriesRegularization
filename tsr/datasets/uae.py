@@ -138,9 +138,10 @@ class UAE_DatasetManager(DatasetManager):
         logger.debug('Unzipping completed')
 
 
-    def get_dataset(self, dataset_name, split="TRAIN", format="TF"):
+    def get_dataset_as_sktime(self, dataset_name, split="TRAIN", format="TF"):
+        path = self.directories[dataset_name][split]
+        return load_from_tsfile_to_dataframe(path)
 
-        raise NotImplementedError
 
     def get_dataset_as_array(self, dataset_name, split="TRAIN"):
         path = self.directories[dataset_name][split]
@@ -152,7 +153,7 @@ class UAE_DatasetManager(DatasetManager):
 
         return x, y
 
-        
+
 
     def get_train_and_val_for_fold(self, fold: int) -> (tf.data.Dataset, tf.data.Dataset):
         raise NotImplementedError
