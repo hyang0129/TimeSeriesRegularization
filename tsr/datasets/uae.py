@@ -5,7 +5,7 @@ from sktime.utils.data_io import load_from_tsfile_to_dataframe
 from sktime.datatypes._panel._convert import (
     from_nested_to_3d_numpy,
 )
-
+from loguru import logger
 
 import pandas as pd
 import numpy as np
@@ -127,9 +127,11 @@ class UAE_DatasetManager(DatasetManager):
     }
 
     def __init__(self, config: Config):
-        raise NotImplementedError
+        self.download_and_unzip()
+
 
     def download_and_unzip(self):
+        logger.info('Downloading UAE Archive for Multivariate TS Classification')
         shell_exec("http://www.timeseriesclassification.com/Downloads/Archives/Multivariate2018_ts.zip")
         shell_exec("unzip -q -n Multivariate2018_ts.zip")
 
