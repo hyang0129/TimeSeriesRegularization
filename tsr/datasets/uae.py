@@ -135,19 +135,24 @@ class UAE_DatasetManager(DatasetManager):
         logger.info('Downloading UAE Archive for Multivariate TS Classification')
         shell_exec("wget http://www.timeseriesclassification.com/Downloads/Archives/Multivariate2018_ts.zip")
         shell_exec("unzip -q -n Multivariate2018_ts.zip")
+        logger.debug('Unzipping completed')
+
 
     def get_dataset(self, dataset_name, split="TRAIN", format="TF"):
 
         raise NotImplementedError
 
-    def get_dataset_as_tensorflow_dataset(self, dataset_name, split="TRAIN"):
+    def get_dataset_as_array(self, dataset_name, split="TRAIN"):
         path = self.directories[dataset_name][split]
 
-        x_train, y_train = load_from_tsfile_to_dataframe(path)
+        x, y = load_from_tsfile_to_dataframe(path)
 
-        return x_train, y_train
+        y = self.to_numeric_classes(y)
+        x = self.convert_sktime_format_to_array(x)
 
+        return x, y
 
+        
 
     def get_train_and_val_for_fold(self, fold: int) -> (tf.data.Dataset, tf.data.Dataset):
         raise NotImplementedError
