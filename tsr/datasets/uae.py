@@ -156,6 +156,30 @@ class UAE_DatasetManager(DatasetManager):
 
         return x, y
 
+    def get_datasets_as_tf(self, dataset_name, batch_size=64, shuffle=1000):
+
+        x, y = self.get_dataset_as_array(dataset_name, split = 'TRAIN')
+        x_test, y_test = self.get_dataset_as_array(dataset_name, split = 'TEST')
+
+        minn = np.min(x)
+        x = (x - minn)
+        maxx = np.max(x)
+        x = x / maxx
+        x_test = x_test - minn
+        x_test = x_test / maxx
+
+        ds = tf.data.Dataset.from_tensor_slices((x, y))
+        ds = ds.repeat()
+        ds = ds.shuffle(shuffle) if shuffle else ds
+        ds = ds.batch(64, drop_remainder = True)
+        ds = ds.map(lambda x, y: (tf.cast(x, tf.float32), y))
+
+        test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).map(lambda x, y: (tf.cast(x, tf.float32), y))
+        test_ds = test_ds.batch(1, drop_remainder = True)
+
+        return ds, test_ds
+
+
     @staticmethod
     def get_to_length(length):
         def to_length(a):
