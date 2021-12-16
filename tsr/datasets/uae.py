@@ -157,7 +157,18 @@ class UAE_DatasetManager(DatasetManager):
         return x, y
 
     def get_datasets_as_tf(self, dataset_name, batch_size=64, shuffle=1000):
+        '''
 
+        Args:
+            dataset_name:
+            batch_size:
+            shuffle:
+
+        Returns:
+            ds
+            test_ds
+            shape of the train dataset
+        '''
         x, y = self.get_dataset_as_array(dataset_name, split = 'TRAIN')
         x_test, y_test = self.get_dataset_as_array(dataset_name, split = 'TEST')
 
@@ -177,7 +188,7 @@ class UAE_DatasetManager(DatasetManager):
         test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).map(lambda x, y: (tf.cast(x, tf.float32), y))
         test_ds = test_ds.batch(1, drop_remainder = True)
 
-        return ds, test_ds
+        return ds, test_ds, x.shape
 
 
     @staticmethod
