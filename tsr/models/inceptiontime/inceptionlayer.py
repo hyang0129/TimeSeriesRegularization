@@ -12,6 +12,7 @@ class InceptionBlock(tf.keras.layers.Layer):
                  stride = 1,
                  depth = 3):
 
+        super().__init__()
         self.nb_filters = nb_filters
         self.use_bottleneck = use_bottleneck
         self.kernel_size = kernel_size - 1
@@ -19,6 +20,7 @@ class InceptionBlock(tf.keras.layers.Layer):
         self.bottleneck_size = 32
         self.stride = stride
         self.depth = depth
+
 
     def call(self, x):
 
@@ -44,6 +46,7 @@ class InceptionLayer(tf.keras.layers.Layer):
                  kernel_size=41,
                  stride = 1):
 
+        super().__init__()
         self.nb_filters = nb_filters
         self.use_bottleneck = use_bottleneck
         self.kernel_size = kernel_size - 1
