@@ -156,7 +156,7 @@ class UAE_DatasetManager(DatasetManager):
 
         return x, y
 
-    def get_datasets_as_tf(self, dataset_name, batch_size=64, shuffle=1000):
+    def get_datasets_as_tf(self, dataset_name, batch_size=64, shuffle=1000, scale = False):
         '''
 
         Args:
@@ -172,12 +172,13 @@ class UAE_DatasetManager(DatasetManager):
         x, y = self.get_dataset_as_array(dataset_name, split = 'TRAIN')
         x_test, y_test = self.get_dataset_as_array(dataset_name, split = 'TEST')
 
-        minn = np.min(x)
-        x = (x - minn)
-        maxx = np.max(x)
-        x = x / maxx
-        x_test = x_test - minn
-        x_test = x_test / maxx
+        if scale:
+            minn = np.min(x)
+            x = (x - minn)
+            maxx = np.max(x)
+            x = x / maxx
+            x_test = x_test - minn
+            x_test = x_test / maxx
 
         ds = tf.data.Dataset.from_tensor_slices((x, y))
         ds = ds.repeat()
