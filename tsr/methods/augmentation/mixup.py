@@ -4,7 +4,7 @@ from typing import Union
 
 
 
-class RandomShifter(Augmentation):
+class Mixup(Augmentation):
     def __init__(self,  batch_size:int, do_prob: float , sequence_shape: Union[list, tuple], linear_mix_min: float = 0.1, linear_mix_max: float = 0.5):
         """
         Linear Mix of two random MTS within the batch, for each MTS within the batch, with chance based on do_prob 
