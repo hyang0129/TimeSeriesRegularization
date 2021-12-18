@@ -1,13 +1,13 @@
 import tensorflow as tf
 
 
-def get_augs(SHAPE, DO_PROB = 0.5):
+def get_augs(SHAPE, DO_PROB=0.5):
     BATCH_SIZE = 64
 
     def random_shift(x, y):
         x = tf.pad(x, [[64, 64], [0, 0]])
-        start = tf.random.uniform(shape = [], minval = 0, maxval = 64, dtype = tf.int64)
-        x = x[start: start + SHAPE[0]]
+        start = tf.random.uniform(shape=[], minval=0, maxval=64, dtype=tf.int64)
+        x = x[start : start + SHAPE[0]]
         x = tf.reshape(x, (SHAPE[0], 23))
         return x, y
 
@@ -22,9 +22,9 @@ def get_augs(SHAPE, DO_PROB = 0.5):
         LINEAR_MIX_MAX = 0.6
         LINEAR_MIX_PROBA = DO_PROB
         batch_size = BATCH_SIZE
-        new = tf.random.uniform((), minval = LINEAR_MIX_MIN, maxval = LINEAR_MIX_MAX)
+        new = tf.random.uniform((), minval=LINEAR_MIX_MIN, maxval=LINEAR_MIX_MAX)
         prob = LINEAR_MIX_PROBA
-        do_aug = tf.cast(tf.random.uniform((batch_size, 1, 1), minval = 0.0, maxval = 1.0) > prob, tf.float32)
+        do_aug = tf.cast(tf.random.uniform((batch_size, 1, 1), minval=0.0, maxval=1.0) > prob, tf.float32)
 
         take_from_b_percetnage = do_aug * new
 
@@ -36,7 +36,7 @@ def get_augs(SHAPE, DO_PROB = 0.5):
         return x
 
     def get_batch_random_cutout():
-        '''Drops a t by n component of the series, t is time steps and n is a selection of variables'''
+        """Drops a t by n component of the series, t is time steps and n is a selection of variables"""
 
         batch = BATCH_SIZE
         length = SHAPE[1]
@@ -47,10 +47,16 @@ def get_augs(SHAPE, DO_PROB = 0.5):
         do_prob = DO_PROB
 
         def time_wise_cut(nothing):
-            time = tf.range(0, length, dtype = tf.float32)
-            start = tf.random.uniform((), maxval = length - max_cutout_length)
-            end = start + tf.random.uniform((), minval = min_coutout_length, maxval = max_cutout_length)
-            do = tf.cast(tf.random.uniform((), ) < do_prob, tf.float32)
+            time = tf.range(0, length, dtype=tf.float32)
+            start = tf.random.uniform((), maxval=length - max_cutout_length)
+            end = start + tf.random.uniform((), minval=min_coutout_length, maxval=max_cutout_length)
+            do = tf.cast(
+                tf.random.uniform(
+                    (),
+                )
+                < do_prob,
+                tf.float32,
+            )
             return tf.cast(tf.logical_and(time > start, time < end), tf.float32) * do
 
         def element_wise_cut(nothing):
@@ -62,7 +68,7 @@ def get_augs(SHAPE, DO_PROB = 0.5):
             return tf.cast(time * elem < 1, tf.float32)
 
         def batch_random_cutout(x):
-            x = x * tf.map_fn(cutout_mask, tf.zeros((batch,)), dtype = tf.float32)
+            x = x * tf.map_fn(cutout_mask, tf.zeros((batch,)), dtype=tf.float32)
             return x
 
         return batch_random_cutout
@@ -77,10 +83,16 @@ def get_augs(SHAPE, DO_PROB = 0.5):
         do_prob = DO_PROB
 
         def time_wise_cut(nothing):
-            time = tf.range(0, length, dtype = tf.float32)
-            start = tf.random.uniform((), maxval = length - max_cutout_length)
-            end = start + tf.random.uniform((), minval = min_coutout_length, maxval = max_cutout_length)
-            do = tf.cast(tf.random.uniform((), ) < do_prob, tf.float32)
+            time = tf.range(0, length, dtype=tf.float32)
+            start = tf.random.uniform((), maxval=length - max_cutout_length)
+            end = start + tf.random.uniform((), minval=min_coutout_length, maxval=max_cutout_length)
+            do = tf.cast(
+                tf.random.uniform(
+                    (),
+                )
+                < do_prob,
+                tf.float32,
+            )
             return tf.cast(tf.logical_and(time > start, time < end), tf.float32) * do
 
         def element_wise_cut(nothing):

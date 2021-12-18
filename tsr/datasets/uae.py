@@ -130,18 +130,15 @@ class UAE_DatasetManager(DatasetManager):
     def __init__(self, config: Config):
         self.download_and_unzip()
 
-
     def download_and_unzip(self):
-        logger.info('Downloading UAE Archive for Multivariate TS Classification')
+        logger.info("Downloading UAE Archive for Multivariate TS Classification")
         shell_exec("wget http://www.timeseriesclassification.com/Downloads/Archives/Multivariate2018_ts.zip")
         shell_exec("unzip -q -n Multivariate2018_ts.zip")
-        logger.debug('Unzipping completed')
-
+        logger.debug("Unzipping completed")
 
     def get_dataset_as_sktime(self, dataset_name, split="TRAIN", format="TF"):
         path = self.directories[dataset_name][split]
         return load_from_tsfile_to_dataframe(path)
-
 
     def get_dataset_as_array(self, dataset_name, split="TRAIN"):
         path = self.directories[dataset_name][split]
@@ -156,8 +153,8 @@ class UAE_DatasetManager(DatasetManager):
 
         return x, y
 
-    def get_datasets_as_tf(self, dataset_name, batch_size=64, shuffle=1000, scale = False):
-        '''
+    def get_datasets_as_tf(self, dataset_name, batch_size=64, shuffle=1000, scale=False):
+        """
 
         Args:
             dataset_name:
@@ -168,13 +165,13 @@ class UAE_DatasetManager(DatasetManager):
             ds
             test_ds
             shape of the train dataset
-        '''
-        x, y = self.get_dataset_as_array(dataset_name, split = 'TRAIN')
-        x_test, y_test = self.get_dataset_as_array(dataset_name, split = 'TEST')
+        """
+        x, y = self.get_dataset_as_array(dataset_name, split="TRAIN")
+        x_test, y_test = self.get_dataset_as_array(dataset_name, split="TEST")
 
         if scale:
             minn = np.min(x)
-            x = (x - minn)
+            x = x - minn
             maxx = np.max(x)
             x = x / maxx
             x_test = x_test - minn
@@ -183,14 +180,13 @@ class UAE_DatasetManager(DatasetManager):
         ds = tf.data.Dataset.from_tensor_slices((x, y))
         ds = ds.repeat()
         ds = ds.shuffle(shuffle) if shuffle else ds
-        ds = ds.batch(64, drop_remainder = True)
+        ds = ds.batch(64, drop_remainder=True)
         ds = ds.map(lambda x, y: (tf.cast(x, tf.float32), y))
 
         test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).map(lambda x, y: (tf.cast(x, tf.float32), y))
-        test_ds = test_ds.batch(1, drop_remainder = True)
+        test_ds = test_ds.batch(1, drop_remainder=True)
 
         return ds, test_ds, x.shape
-
 
     @staticmethod
     def get_to_length(length):
@@ -202,7 +198,6 @@ class UAE_DatasetManager(DatasetManager):
     @staticmethod
     def get_max_length(x):
         return np.max(x.iloc[:, 0].apply(lambda x: len(x)))
-
 
     def get_train_and_val_for_fold(self, fold: int) -> (tf.data.Dataset, tf.data.Dataset):
         raise NotImplementedError
