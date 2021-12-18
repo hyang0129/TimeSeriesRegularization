@@ -1,8 +1,7 @@
 import tensorflow as tf
 
 
-def get_augs(x, DO_PROB = 0.5):
-    SHAPE = x.shape
+def get_augs(SHAPE, DO_PROB = 0.5):
     BATCH_SIZE = 64
 
     def random_shift(x, y):
