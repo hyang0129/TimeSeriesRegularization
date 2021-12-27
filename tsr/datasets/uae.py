@@ -253,6 +253,6 @@ class UAE_DatasetManager(DatasetManager):
             x = combined_x[train_indices]
             y = combined_y[train_indices]
             x_test = combined_x[test_indices]
-            y_test = combined_x[test_indices]
+            y_test = combined_y[test_indices]
 
         return x, y, x_test, y_test
