@@ -1,23 +1,9 @@
 import tensorflow as tf
 
-
 class Classifier_INCEPTION:
-    def __init__(
-        self,
-        output_directory,
-        input_shape,
-        nb_classes,
-        build=True,
-        batch_size=64,
-        nb_filters=32,
-        use_residual=True,
-        use_bottleneck=True,
-        depth=6,
-        kernel_size=41,
-        nb_epochs=1500,
-    ):
 
-        self.output_directory = output_directory
+    def __init__(self, input_shape, nb_classes, build=True, batch_size=64,
+                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=41, nb_epochs=1500):
 
         self.nb_filters = nb_filters
         self.use_residual = use_residual
@@ -29,15 +15,14 @@ class Classifier_INCEPTION:
         self.bottleneck_size = 32
         self.nb_epochs = nb_epochs
 
-        if build is True:
+        if build == True:
             self.model = self.build_model(input_shape, nb_classes)
 
-    def _inception_module(self, input_tensor, stride=1, activation="linear"):
+    def _inception_module(self, input_tensor, stride=1, activation='linear'):
 
         if self.use_bottleneck and int(input_tensor.shape[-1]) > 1:
-            input_inception = tf.keras.layers.Conv1D(
-                filters=self.bottleneck_size, kernel_size=1, padding="same", activation=activation, use_bias=False
-            )(input_tensor)
+            input_inception = tf.keras.layers.Conv1D(filters=self.bottleneck_size, kernel_size=1,
+                                                  padding='same', activation=activation, use_bias=False)(input_tensor)
         else:
             input_inception = input_tensor
 
@@ -47,38 +32,29 @@ class Classifier_INCEPTION:
         conv_list = []
 
         for i in range(len(kernel_size_s)):
-            conv_list.append(
-                tf.keras.layers.Conv1D(
-                    filters=self.nb_filters,
-                    kernel_size=kernel_size_s[i],
-                    strides=stride,
-                    padding="same",
-                    activation=activation,
-                    use_bias=False,
-                )(input_inception)
-            )
+            conv_list.append(tf.keras.layers.Conv1D(filters=self.nb_filters, kernel_size=kernel_size_s[i],
+                                                 strides=stride, padding='same', activation=activation, use_bias=False)(
+                input_inception))
 
-        max_pool_1 = tf.keras.layers.MaxPool1D(pool_size=3, strides=stride, padding="same")(input_tensor)
+        max_pool_1 = tf.keras.layers.MaxPool1D(pool_size=3, strides=stride, padding='same')(input_tensor)
 
-        conv_6 = tf.keras.layers.Conv1D(
-            filters=self.nb_filters, kernel_size=1, padding="same", activation=activation, use_bias=False
-        )(max_pool_1)
+        conv_6 = tf.keras.layers.Conv1D(filters=self.nb_filters, kernel_size=1,
+                                     padding='same', activation=activation, use_bias=False)(max_pool_1)
 
         conv_list.append(conv_6)
 
         x = tf.keras.layers.Concatenate(axis=2)(conv_list)
         x = tf.keras.layers.BatchNormalization()(x)
-        x = tf.keras.layers.Activation(activation="relu")(x)
+        x = tf.keras.layers.Activation(activation='relu')(x)
         return x
 
     def _shortcut_layer(self, input_tensor, out_tensor):
-        shortcut_y = tf.keras.layers.Conv1D(
-            filters=int(out_tensor.shape[-1]), kernel_size=1, padding="same", use_bias=False
-        )(input_tensor)
-        shortcut_y = tf.keras.layers.normalization.BatchNormalization()(shortcut_y)
+        shortcut_y = tf.keras.layers.Conv1D(filters=int(out_tensor.shape[-1]), kernel_size=1,
+                                         padding='same', use_bias=False)(input_tensor)
+        shortcut_y = tf.keras.layers.BatchNormalization()(shortcut_y)
 
         x = tf.keras.layers.Add()([shortcut_y, out_tensor])
-        x = tf.keras.layers.Activation("relu")(x)
+        x = tf.keras.layers.Activation('relu')(x)
         return x
 
     def build_model(self, input_shape, nb_classes):
@@ -97,21 +73,8 @@ class Classifier_INCEPTION:
 
         gap_layer = tf.keras.layers.GlobalAveragePooling1D()(x)
 
-        output_layer = tf.keras.layers.Dense(nb_classes, activation="softmax")(gap_layer)
+        output_layer = tf.keras.layers.Dense(nb_classes, activation='softmax')(gap_layer)
 
         model = tf.keras.models.Model(inputs=input_layer, outputs=output_layer)
-
-        # model.compile(loss='categorical_crossentropy', optimizer=tf.keras.optimizers.Adam(),
-        #               metrics=['accuracy'])
-        #
-        # reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=50,
-        #                                               min_lr=0.0001)
-        #
-        # file_path = self.output_directory + 'best_model.hdf5'
-        #
-        # model_checkpoint = tf.keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='loss',
-        #                                                    save_best_only=True)
-        #
-        # self.callbacks = [reduce_lr, model_checkpoint]
 
         return model
