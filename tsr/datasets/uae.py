@@ -153,14 +153,15 @@ class UAE_DatasetManager(DatasetManager):
 
         return x, y
 
-    def get_datasets_as_tf(self, dataset_name, batch_size=64, shuffle=1000, scale=False):
+    def get_datasets_as_tf(self, dataset_name, batch_size=64, shuffle=1000, scale=False, resample_seed = 0):
         """
 
         Args:
             dataset_name:
             batch_size:
             shuffle:
-
+            resample_seed: if not 0, then resamples train and test so they each have the original number of each class,
+            but examples are randomly distributed between train and test
         Returns:
             ds
             test_ds
@@ -168,6 +169,9 @@ class UAE_DatasetManager(DatasetManager):
         """
         x, y = self.get_dataset_as_array(dataset_name, split="TRAIN")
         x_test, y_test = self.get_dataset_as_array(dataset_name, split="TEST")
+
+        x, y, x_test, y_test = self.resample_train_test(x, y, x_test, y_test, seed=resample_seed)
+
 
         if scale:
             minn = np.min(x)
@@ -217,3 +221,37 @@ class UAE_DatasetManager(DatasetManager):
         arr = from_nested_to_3d_numpy(x_train)
         arr = np.transpose(arr, (0, 2, 1))
         return arr
+
+    @staticmethod
+    def resample_train_test(x, y, x_test, y_test, seed = 0):
+
+        if not seed == 0:
+
+            combined_y = np.concatenate([y_test, y])
+            combined_x = np.concatenate([x_test, x])
+
+            np.random.seed(seed = seed)
+            train_indices = []
+            test_indices = []
+
+            for cls in range(np.max(combined_y) + 1):
+                np.max(combined_y)
+
+                arr = np.argwhere(combined_y == cls)
+
+                np.random.shuffle(arr)
+
+                train_index = arr[:len(np.argwhere(y == cls))]
+                test_index = arr[len(np.argwhere(y == cls)):]
+                train_indices.append(train_index)
+                test_indices.append(test_index)
+
+            train_indices = np.concatenate(train_indices)
+            test_indices = np.concatenate(test_indices)
+
+            x = combined_x[train_indices]
+            y = combined_y[train_indices]
+            x_test = combined_x[test_indices]
+            y_test = combined_x[test_indices]
+
+        return x, y, x_test, y_test
