@@ -247,8 +247,8 @@ class UAE_DatasetManager(DatasetManager):
                 train_indices.append(train_index)
                 test_indices.append(test_index)
 
-            train_indices = np.concatenate(train_indices)
-            test_indices = np.concatenate(test_indices)
+            train_indices = np.squeeze(np.concatenate(train_indices))
+            test_indices = np.squeeze(np.concatenate(test_indices))
 
             x = combined_x[train_indices]
             y = combined_y[train_indices]
