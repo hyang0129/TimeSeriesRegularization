@@ -37,6 +37,11 @@ def get_augs(SHAPE, BATCH_SIZE = 64, DO_PROB = 0.5, element_prob = 0.5, version 
             x, y = example['input'], example['target']
             return x, y
 
+    elif version == -1:
+
+        def batch_aug(x, y):
+            return x, y
+
     else:
         raise KeyError('Augmentation Version Not Specified')
 
