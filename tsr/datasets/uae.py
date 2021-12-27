@@ -29,10 +29,10 @@ class UAE_DatasetManager(DatasetManager):
             "TEST": "Multivariate_ts/BasicMotions/BasicMotions_TEST.ts",
             "TRAIN": "Multivariate_ts/BasicMotions/BasicMotions_TRAIN.ts",
         },
-        "CharacterTrajectories": {
-            "TEST": "Multivariate_ts/CharacterTrajectories/CharacterTrajectories_TEST.ts",
-            "TRAIN": "Multivariate_ts/CharacterTrajectories/CharacterTrajectories_TRAIN.ts",
-        },
+        # "CharacterTrajectories": {
+        #     "TEST": "Multivariate_ts/CharacterTrajectories/CharacterTrajectories_TEST.ts",
+        #     "TRAIN": "Multivariate_ts/CharacterTrajectories/CharacterTrajectories_TRAIN.ts",
+        # },
         "Cricket": {
             "TEST": "Multivariate_ts/Cricket/Cricket_TEST.ts",
             "TRAIN": "Multivariate_ts/Cricket/Cricket_TRAIN.ts",
@@ -74,14 +74,14 @@ class UAE_DatasetManager(DatasetManager):
             "TEST": "Multivariate_ts/Heartbeat/Heartbeat_TEST.ts",
             "TRAIN": "Multivariate_ts/Heartbeat/Heartbeat_TRAIN.ts",
         },
-        "InsectWingbeat": {
-            "TEST": "Multivariate_ts/InsectWingbeat/InsectWingbeat_TEST.ts",
-            "TRAIN": "Multivariate_ts/InsectWingbeat/InsectWingbeat_TRAIN.ts",
-        },
-        "JapaneseVowels": {
-            "TEST": "Multivariate_ts/JapaneseVowels/JapaneseVowels_TEST.ts",
-            "TRAIN": "Multivariate_ts/JapaneseVowels/JapaneseVowels_TRAIN.ts",
-        },
+        # "InsectWingbeat": {
+        #     "TEST": "Multivariate_ts/InsectWingbeat/InsectWingbeat_TEST.ts",
+        #     "TRAIN": "Multivariate_ts/InsectWingbeat/InsectWingbeat_TRAIN.ts",
+        # },
+        # "JapaneseVowels": {
+        #     "TEST": "Multivariate_ts/JapaneseVowels/JapaneseVowels_TEST.ts",
+        #     "TRAIN": "Multivariate_ts/JapaneseVowels/JapaneseVowels_TRAIN.ts",
+        # },
         "LSST": {"TEST": "Multivariate_ts/LSST/LSST_TEST.ts", "TRAIN": "Multivariate_ts/LSST/LSST_TRAIN.ts"},
         "Libras": {"TEST": "Multivariate_ts/Libras/Libras_TEST.ts", "TRAIN": "Multivariate_ts/Libras/Libras_TRAIN.ts"},
         "MotorImagery": {
@@ -113,10 +113,10 @@ class UAE_DatasetManager(DatasetManager):
             "TEST": "Multivariate_ts/SelfRegulationSCP2/SelfRegulationSCP2_TEST.ts",
             "TRAIN": "Multivariate_ts/SelfRegulationSCP2/SelfRegulationSCP2_TRAIN.ts",
         },
-        "SpokenArabicDigits": {
-            "TEST": "Multivariate_ts/SpokenArabicDigits/SpokenArabicDigits_TEST.ts",
-            "TRAIN": "Multivariate_ts/SpokenArabicDigits/SpokenArabicDigits_TRAIN.ts",
-        },
+        # "SpokenArabicDigits": {
+        #     "TEST": "Multivariate_ts/SpokenArabicDigits/SpokenArabicDigits_TEST.ts",
+        #     "TRAIN": "Multivariate_ts/SpokenArabicDigits/SpokenArabicDigits_TRAIN.ts",
+        # },
         "StandWalkJump": {
             "TEST": "Multivariate_ts/StandWalkJump/StandWalkJump_TEST.ts",
             "TRAIN": "Multivariate_ts/StandWalkJump/StandWalkJump_TRAIN.ts",
