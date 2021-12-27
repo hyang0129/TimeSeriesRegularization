@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 class Classifier_INCEPTION:
-
+    
     def __init__(self, input_shape, nb_classes, build=True, batch_size=64,
                  nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=41, nb_epochs=1500):
 
