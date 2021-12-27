@@ -39,7 +39,7 @@ class Cutmix(Augmentation):
 
         # apply the function across a tensor with shape [batchsize] to return
         # a tensor with shape [batchsize, length, channels]
-        batch_cutmix_masks = tf.map_fn(self.get_cutmix_mask, tf.zeros((self.batch,)), dtype=tf.float32)
+        batch_cutmix_masks = tf.map_fn(self.get_cutmix_mask, tf.zeros((self.batch_size,)), dtype=tf.float32)
 
         # get a mixup addition sequence
         original_input = x
@@ -55,7 +55,7 @@ class Cutmix(Augmentation):
         time = tf.range(0, self.sequence_shape[0], dtype=tf.float32)
 
         # generate the start and end value
-        start = tf.random.uniform((), maxval=self.sequence_shape - self.max_cutmix_len)
+        start = tf.random.uniform((), maxval=self.sequence_shape[0] - self.max_cutmix_len)
         end = start + tf.random.uniform((), minval=self.min_cutmix_len, maxval=self.max_cutmix_len)
 
         do = tf.cast(

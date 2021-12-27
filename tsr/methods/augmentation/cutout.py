@@ -39,7 +39,7 @@ class Cutout(Augmentation):
 
         # apply the function across a tensor with shape [batchsize] to return
         # a tensor with shape [batchsize, length, channels]
-        batch_cutout_masks = tf.map_fn(self.get_cutout_mask, tf.zeros((self.batch,)), dtype=tf.float32)
+        batch_cutout_masks = tf.map_fn(self.get_cutout_mask, tf.zeros((self.batch_size,)), dtype=tf.float32)
         x = x * batch_cutout_masks
 
         example["input"] = x
@@ -52,7 +52,7 @@ class Cutout(Augmentation):
         time = tf.range(0, self.sequence_shape[0], dtype=tf.float32)
 
         # generate the start and end value
-        start = tf.random.uniform((), maxval=self.sequence_shape - self.max_cutout_len)
+        start = tf.random.uniform((), maxval=self.sequence_shape[0] - self.max_cutout_len)
         end = start + tf.random.uniform((), minval=self.min_cutout_len, maxval=self.max_cutout_len)
 
         do = tf.cast(
