@@ -46,7 +46,7 @@ class Cutmix(Augmentation):
         mixup_addition = tf.random.shuffle(x)
 
         # return original sequence where cutmixmask == 1 and mixup sequence otherwise
-        example["input"] = tf.where(batch_cutmix_masks, original_input, mixup_addition)
+        example["input"] = tf.where(batch_cutmix_masks == 1, original_input, mixup_addition)
 
         return example
 
