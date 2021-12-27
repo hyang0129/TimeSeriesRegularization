@@ -166,6 +166,7 @@ class UAE_DatasetManager(DatasetManager):
             ds
             test_ds
             shape of the train dataset
+            number of classes
         """
         x, y = self.get_dataset_as_array(dataset_name, split="TRAIN")
         x_test, y_test = self.get_dataset_as_array(dataset_name, split="TEST")
@@ -190,7 +191,7 @@ class UAE_DatasetManager(DatasetManager):
         test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).map(lambda x, y: (tf.cast(x, tf.float32), y))
         test_ds = test_ds.batch(1, drop_remainder=True)
 
-        return ds, test_ds, x.shape
+        return ds, test_ds, x.shape, np.max(y) + 1
 
     @staticmethod
     def get_to_length(length):
