@@ -11,8 +11,8 @@ def get_augs(SHAPE, BATCH_SIZE = 64, DO_PROB = 0.5, element_prob = 0.5, version 
         element_prob = 0.5
 
     elif version == 2:
-        DO_PROB = 0.7
-        element_prob = 0.4
+        DO_PROB = 0.8
+        element_prob = 0.2
 
     mixup = Mixup(batch_size = BATCH_SIZE,
                   do_prob = DO_PROB,
@@ -70,7 +70,6 @@ def get_augs(SHAPE, BATCH_SIZE = 64, DO_PROB = 0.5, element_prob = 0.5, version 
             example = {'input': x, 'target': y}
             example = cutmix(example)
             example = cutmix(example)
-            example = cutout(example)
             example = cutout(example)
             example = mixup(example)
             x, y = example['input'], example['target']
