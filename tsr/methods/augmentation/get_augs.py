@@ -14,6 +14,10 @@ def get_augs(SHAPE, BATCH_SIZE = 64, DO_PROB = 0.5, element_prob = 0.5, version 
         DO_PROB = 0.8
         element_prob = 0.2
 
+    elif version == 3:
+        DO_PROB = 0.5
+        element_prob = 0.3
+
     mixup = Mixup(batch_size = BATCH_SIZE,
                   do_prob = DO_PROB,
                   sequence_shape = SHAPE[1:],
@@ -74,6 +78,16 @@ def get_augs(SHAPE, BATCH_SIZE = 64, DO_PROB = 0.5, element_prob = 0.5, version 
             example = mixup(example)
             x, y = example['input'], example['target']
             return x, y
+
+    elif version == 3:
+
+        def batch_aug(x, y):
+            example = {'input': x, 'target': y}
+            example = cutout(example)
+            example = cutout(example)
+            x, y = example['input'], example['target']
+            return x, y
+
 
     else:
         raise KeyError('Augmentation Version Not Specified')
