@@ -46,6 +46,7 @@ class WindowWarp(Augmentation):
 
         return example
 
+    @tf.function
     def singular_call(self, input: tf.Tensor) -> tf.Tensor:
 
         if check_proba(self.do_prob):
