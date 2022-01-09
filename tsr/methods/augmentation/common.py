@@ -27,3 +27,8 @@ def cut_time_series(series, cut_start, cut_end, insert=None):
     series = tf.concat([x for x in to_concat if not x is None], axis = 0)
     series = pad_to_length(series, input_length)
     return series
+
+def check_proba(proba, shape = None):
+    if shape is None:
+        shape = [1]
+    return tf.cast(tf.random.uniform(shape = shape) <= proba, tf.float32)

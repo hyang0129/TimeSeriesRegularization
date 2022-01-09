@@ -1,4 +1,4 @@
-from tsr.methods.augmentation import Cutmix, Mixup, Cutout, WindowWarp
+from tsr.methods.augmentation import Cutmix, Mixup, Cutout, WindowWarp, RandomShifter
 
 
 def get_augs(SHAPE, BATCH_SIZE = 64, DO_PROB = 0.5, element_prob = 0.5, version = 0):
@@ -199,6 +199,27 @@ def get_augs(SHAPE, BATCH_SIZE = 64, DO_PROB = 0.5, element_prob = 0.5, version 
             example = expand_window(example)
             x, y = example['input'], example['target']
             return x, y
+
+    elif version == 6:
+        DO_PROB = 0.5
+
+        shifter = RandomShifter(batch_size = BATCH_SIZE,
+                        do_prob = DO_PROB,
+                        sequence_shape = SHAPE[1:],
+                        min_window_size = SHAPE[1] // 8,
+                        max_window_size = SHAPE[1] // 3,
+                        scale_factor = 2
+                                   )
+
+
+        def batch_aug(x, y):
+            example = {'input': x, 'target': y}
+            example = shrink_window(example)
+            example = expand_window(example)
+            x, y = example['input'], example['target']
+            return x, y
+
+
 
     else:
         raise KeyError('Augmentation Version Not Specified')

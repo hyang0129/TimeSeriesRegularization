@@ -1,5 +1,5 @@
 from tsr.methods.augmentation import Augmentation
-from tsr.methods.augmentation.common import resize_time_series, cut_time_series
+from tsr.methods.augmentation.common import resize_time_series, cut_time_series, check_proba
 import tensorflow as tf
 from typing import Union
 
@@ -47,15 +47,18 @@ class WindowWarp(Augmentation):
         return example
 
     def singular_call(self, input: tf.Tensor) -> tf.Tensor:
-        start, end = self.get_window()
-        window_size = end - start
 
-        target_window_size = max(int((float(window_size) * self.scale_factor)), 2)
+        if check_proba(self.do_prob):
+            start, end = self.get_window()
+            window_size = end - start
 
-        window = input[start:end]
-        window = resize_time_series(window, target_window_size, method = self.method)
+            target_window_size = max(int((float(window_size) * self.scale_factor)), 2)
 
-        input = cut_time_series(input, start, end, window)
+            window = input[start:end]
+            window = resize_time_series(window, target_window_size, method = self.method)
+
+            input = cut_time_series(input, start, end, window)
+
         return input
 
     def get_window(self):
