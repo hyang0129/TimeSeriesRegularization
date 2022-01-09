@@ -1,4 +1,5 @@
-from tsr.methods.augmentation import Augmentation, check_proba
+from tsr.methods.augmentation import Augmentation
+from tsr.methods.augmentation.common import check_proba
 import tensorflow as tf
 from typing import Union
 
