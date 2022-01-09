@@ -5,7 +5,7 @@ from tsr.config import Config
 from tsr.models.attention.positionalencoding import PositionalEncoding
 from tsr.models.inceptiontime.inceptionlayer import InceptionBlock
 
-class ConvMHSA(tf.keras.Sequential):
+class InceptionMHSA(tf.keras.Sequential):
     @classmethod
     def from_config(cls, config: Config):
         raise NotImplementedError
