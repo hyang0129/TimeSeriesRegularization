@@ -31,4 +31,4 @@ def cut_time_series(series, cut_start, cut_end, insert=None):
 def check_proba(proba, shape = None):
     if shape is None:
         shape = [1]
-    return tf.cast(tf.random.uniform(shape = shape) <= proba, tf.float32)
+    return tf.random.uniform(shape = shape) <= proba
