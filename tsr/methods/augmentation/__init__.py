@@ -5,3 +5,4 @@ from tsr.methods.augmentation.mixup import Mixup
 from tsr.methods.augmentation.cutout import Cutout
 from tsr.methods.augmentation.get_augs import get_augs
 from tsr.methods.augmentation.common import resize_time_series, pad_to_length, cut_time_series
+from tsr.methods.augmentation.windowwarp import WindowWarp
