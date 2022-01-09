@@ -200,22 +200,20 @@ def get_augs(SHAPE, BATCH_SIZE = 64, DO_PROB = 0.5, element_prob = 0.5, version 
             x, y = example['input'], example['target']
             return x, y
 
-    elif version == 6:
+    elif version == 7:
         DO_PROB = 0.5
 
-        shifter = RandomShifter(batch_size = BATCH_SIZE,
+        shifter = RandomShifter(
                         do_prob = DO_PROB,
                         sequence_shape = SHAPE[1:],
-                        min_window_size = SHAPE[1] // 8,
-                        max_window_size = SHAPE[1] // 3,
-                        scale_factor = 2
+                        shift_backward_max = SHAPE[1] // 8,
+                        shift_backward_min = SHAPE[1] // 16,
                                    )
 
 
         def batch_aug(x, y):
             example = {'input': x, 'target': y}
-            example = shrink_window(example)
-            example = expand_window(example)
+            example = shifter(example)
             x, y = example['input'], example['target']
             return x, y
 
