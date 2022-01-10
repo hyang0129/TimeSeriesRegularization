@@ -100,7 +100,6 @@ def get_augs(SHAPE, BATCH_SIZE = 64, DO_PROB = 0.5, element_prob = 0.5, version 
                         channel_replace_prob = element_prob,
 
                         )
-        cutmix.batch = BATCH_SIZE
         cutout = Cutout(
             batch_size = BATCH_SIZE,
             do_prob = DO_PROB,
@@ -217,7 +216,57 @@ def get_augs(SHAPE, BATCH_SIZE = 64, DO_PROB = 0.5, element_prob = 0.5, version 
             x, y = example['input'], example['target']
             return x, y
 
+    elif version == 8:
+        DO_PROB = 0.8
+        element_prob = 0.2
 
+        mixup = Mixup(batch_size = BATCH_SIZE,
+                      do_prob = DO_PROB,
+                      sequence_shape = SHAPE[1:],
+                      linear_mix_min = 0.1,
+                      linear_mix_max = 0.5)
+
+        cutmix = Cutmix(batch_size = BATCH_SIZE,
+                        do_prob = DO_PROB,
+                        sequence_shape = SHAPE[1:],
+                        min_cutmix_len = SHAPE[1] // 2,
+                        max_cutmix_len = SHAPE[1],
+                        channel_replace_prob = element_prob,
+
+                        )
+        cutout = Cutout(
+            batch_size = BATCH_SIZE,
+            do_prob = DO_PROB,
+            sequence_shape = SHAPE[1:],
+            min_cutout_len = SHAPE[1] // 2,
+            max_cutout_len = SHAPE[1],
+            channel_drop_prob = element_prob,
+        )
+        expand_window = WindowWarp(batch_size = BATCH_SIZE,
+                                   do_prob = DO_PROB,
+                                   sequence_shape = SHAPE[1:],
+                                   min_window_size = SHAPE[1] // 8,
+                                   max_window_size = SHAPE[1] // 3,
+                                   scale_factor = 2
+                                   )
+        shrink_window = WindowWarp(batch_size = BATCH_SIZE,
+                                   do_prob = DO_PROB,
+                                   sequence_shape = SHAPE[1:],
+                                   min_window_size = SHAPE[1] // 8,
+                                   max_window_size = SHAPE[1] // 3,
+                                   scale_factor = 0.5
+                                   )
+
+        def batch_aug(x, y):
+            example = {'input': x, 'target': y}
+            example = cutmix(example)
+            example = cutout(example)
+            example = cutout(example)
+            example = mixup(example)
+            example = shrink_window(example)
+            example = expand_window(example)
+            x, y = example['input'], example['target']
+            return x, y
 
     else:
         raise KeyError('Augmentation Version Not Specified')
