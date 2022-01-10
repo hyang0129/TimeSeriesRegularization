@@ -72,9 +72,9 @@ class ConvMHSA2(tf.keras.Sequential):
         num_class,
     ):
 
-        conv_filters=[128, 128, 256, 256, 512],
-        kernel=[7, 7, 3, 7, 7],
-        strides=[1, 2, 1, 2, 2],
+        conv_filters= [128, 128, 256, 256, 512]
+        kernel=[7, 7, 3, 7, 7]
+        strides=[1, 2, 1, 2, 2]
         d_model = 512
         num_heads = 8
         dff = 512
