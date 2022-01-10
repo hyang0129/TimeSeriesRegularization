@@ -46,19 +46,21 @@ class WindowWarp(Augmentation):
 
         return example
 
-    @tf.function
     def singular_call(self, input: tf.Tensor) -> tf.Tensor:
-
         if check_proba(self.do_prob):
             start, end = self.get_window()
             window_size = end - start
 
-            target_window_size = max(int((float(window_size) * self.scale_factor)), 2)
+            target_window_size = tf.cast(tf.math.maximum(int((float(window_size) * self.scale_factor)), 2), tf.int64)
 
             window = input[start:end]
             window = resize_time_series(window, target_window_size, method = self.method)
 
-            input = cut_time_series(input, start, end, window)
+            zeros = tf.zeros_like(input)[:tf.math.maximum(tf.cast(0, tf.int64), window_size - target_window_size)]
+
+            input = tf.concat([input[:start], window, input[end:], zeros], axis = 0)[:self.sequence_shape[0]]
+
+            input = tf.reshape(input, shape = self.sequence_shape)
 
         return input
 
