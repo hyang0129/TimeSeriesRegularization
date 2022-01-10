@@ -190,7 +190,7 @@ def get_augs(SHAPE, BATCH_SIZE = 64, DO_PROB = 0.5, element_prob = 0.5, version 
                         sequence_shape = SHAPE[1:],
                         min_window_size = SHAPE[1] // 8,
                         max_window_size = SHAPE[1] // 3,
-                        scale_factor = 1
+                        scale_factor = 0.5
                                    )
 
         def batch_aug(x, y):
