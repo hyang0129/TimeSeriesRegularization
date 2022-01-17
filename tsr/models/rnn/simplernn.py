@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tsr.config import Config
 
-class InceptionMHSA(tf.keras.Sequential):
+class SimpleRNN(tf.keras.Sequential):
     @classmethod
     def from_config(cls, config: Config):
         raise NotImplementedError
