@@ -1,7 +1,7 @@
 from tsr.datasets.datasetmanager import DatasetManager
 from tsr.config import Config
 from tsr.utils import shell_exec
-from sktime.utils.data_io import load_from_tsfile_to_dataframe
+from sktime.datasets import load_from_tsfile_to_dataframe
 from sktime.datatypes._panel._convert import (
     from_nested_to_3d_numpy,
 )
