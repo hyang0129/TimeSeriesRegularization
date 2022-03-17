@@ -5,7 +5,9 @@ from typing import Union
 
 
 class RandomShifter(Augmentation):
-    def __init__(self, shift_backward_max: int, shift_forward_max: int, sequence_shape: Union[list, tuple], do_prob=1.0):
+    def __init__(
+        self, shift_backward_max: int, shift_forward_max: int, sequence_shape: Union[list, tuple], do_prob=1.0
+    ):
         """
         Padded random shift of a sequence. A sequence is shifted forward or back by n timesteps by choosing n as a
         value between the forward max and backward max. If backward max is provided as a negative number, it will

@@ -5,6 +5,7 @@ from tsr.config import Config
 from tsr.models.attention.positionalencoding import PositionalEncoding
 from tsr.models.inceptiontime.inceptionlayer import InceptionBlock
 
+
 class InceptionMHSA(tf.keras.Sequential):
     @classmethod
     def from_config(cls, config: Config):
@@ -20,17 +21,18 @@ class InceptionMHSA(tf.keras.Sequential):
         dff = 512
 
         super().__init__(
-            ([
-                tf.keras.layers.Input(input_shape),
-                InceptionBlock(stride = 2),
-                InceptionBlock(stride = 2),
-                InceptionBlock(stride = 2),
-                tf.keras.layers.Conv1D(d_model, 1, activation = 'tanh'),
-                PositionalEncoding(d_model = d_model),
-                EncoderLayer(d_model = d_model, num_heads = num_heads, dff = dff),
-                EncoderLayer(d_model = d_model, num_heads = num_heads, dff = dff),
-                tf.keras.layers.Lambda(lambda x: x[:, -1, :]),
-                tf.keras.layers.Dense(num_class, activation = "softmax")
-            ]
+            (
+                [
+                    tf.keras.layers.Input(input_shape),
+                    InceptionBlock(stride=2),
+                    InceptionBlock(stride=2),
+                    InceptionBlock(stride=2),
+                    tf.keras.layers.Conv1D(d_model, 1, activation="tanh"),
+                    PositionalEncoding(d_model=d_model),
+                    EncoderLayer(d_model=d_model, num_heads=num_heads, dff=dff),
+                    EncoderLayer(d_model=d_model, num_heads=num_heads, dff=dff),
+                    tf.keras.layers.Lambda(lambda x: x[:, -1, :]),
+                    tf.keras.layers.Dense(num_class, activation="softmax"),
+                ]
             )
         )

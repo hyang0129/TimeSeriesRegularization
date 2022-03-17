@@ -1,19 +1,19 @@
 from tsr.methods.augmentation import Augmentation
-from tsr.methods.augmentation.common import resize_time_series, cut_time_series, check_proba
+from tsr.methods.augmentation.common import resize_time_series, check_proba
 import tensorflow as tf
 from typing import Union
 
 
 class WindowWarp(Augmentation):
     def __init__(
-            self,
-            batch_size: int,
-            do_prob: float,
-            sequence_shape: Union[list, tuple],
-            min_window_size: int,
-            max_window_size: int,
-            scale_factor: float,
-            method: str = 'bilinear',
+        self,
+        batch_size: int,
+        do_prob: float,
+        sequence_shape: Union[list, tuple],
+        min_window_size: int,
+        max_window_size: int,
+        scale_factor: float,
+        method: str = "bilinear",
     ):
         """
         Use bilinear interpolation (as if it was an image) to resize a window and insert the window back.
@@ -40,7 +40,7 @@ class WindowWarp(Augmentation):
 
         # apply the function across a tensor with shape [batchsize] to return
         # a tensor with shape [batchsize, length, channels]
-        x = tf.map_fn(self.singular_call, x, dtype = tf.float32)
+        x = tf.map_fn(self.singular_call, x, dtype=tf.float32)
 
         example["input"] = x
 
@@ -54,21 +54,22 @@ class WindowWarp(Augmentation):
             target_window_size = tf.cast(tf.math.maximum(int((float(window_size) * self.scale_factor)), 2), tf.int64)
 
             window = input[start:end]
-            window = resize_time_series(window, target_window_size, method = self.method)
+            window = resize_time_series(window, target_window_size, method=self.method)
 
-            zeros = tf.zeros_like(input)[:tf.math.maximum(tf.cast(0, tf.int64), window_size - target_window_size)]
+            zeros = tf.zeros_like(input)[: tf.math.maximum(tf.cast(0, tf.int64), window_size - target_window_size)]
 
-            input = tf.concat([input[:start], window, input[end:], zeros], axis = 0)[:self.sequence_shape[0]]
+            input = tf.concat([input[:start], window, input[end:], zeros], axis=0)[: self.sequence_shape[0]]
 
-            input = tf.reshape(input, shape = self.sequence_shape)
+            input = tf.reshape(input, shape=self.sequence_shape)
 
         return input
 
     def get_window(self):
         # max val is exclusive
-        start = tf.random.uniform((), maxval = self.sequence_shape[0] - self.max_window_size + 1, dtype = tf.int64)
-        end = start + tf.random.uniform((), minval = self.min_window_size, maxval = self.max_window_size + 1,
-                                        dtype = tf.int64)
+        start = tf.random.uniform((), maxval=self.sequence_shape[0] - self.max_window_size + 1, dtype=tf.int64)
+        end = start + tf.random.uniform(
+            (), minval=self.min_window_size, maxval=self.max_window_size + 1, dtype=tf.int64
+        )
 
         return start, end
 

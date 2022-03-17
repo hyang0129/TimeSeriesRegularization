@@ -153,7 +153,7 @@ class UAE_DatasetManager(DatasetManager):
 
         return x, y
 
-    def get_datasets_as_tf(self, dataset_name, batch_size=64, shuffle=1000, scale=False, resample_seed = 0):
+    def get_datasets_as_tf(self, dataset_name, batch_size=64, shuffle=1000, scale=False, resample_seed=0):
         """
 
         Args:
@@ -172,7 +172,6 @@ class UAE_DatasetManager(DatasetManager):
         x_test, y_test = self.get_dataset_as_array(dataset_name, split="TEST")
 
         x, y, x_test, y_test = self.resample_train_test(x, y, x_test, y_test, seed=resample_seed)
-
 
         if scale:
             minn = np.min(x)
@@ -224,14 +223,14 @@ class UAE_DatasetManager(DatasetManager):
         return arr
 
     @staticmethod
-    def resample_train_test(x, y, x_test, y_test, seed = 0):
+    def resample_train_test(x, y, x_test, y_test, seed=0):
 
         if not seed == 0:
 
             combined_y = np.concatenate([y_test, y])
             combined_x = np.concatenate([x_test, x])
 
-            np.random.seed(seed = seed)
+            np.random.seed(seed=seed)
             train_indices = []
             test_indices = []
 
@@ -242,8 +241,8 @@ class UAE_DatasetManager(DatasetManager):
 
                 np.random.shuffle(arr)
 
-                train_index = arr[:len(np.argwhere(y == cls))]
-                test_index = arr[len(np.argwhere(y == cls)):]
+                train_index = arr[: len(np.argwhere(y == cls))]
+                test_index = arr[len(np.argwhere(y == cls)) :]
                 train_indices.append(train_index)
                 test_indices.append(test_index)
 

@@ -61,6 +61,7 @@ class ConvMHSA(tf.keras.Sequential):
             ]
         )
 
+
 class ConvMHSA2(tf.keras.Sequential):
     @classmethod
     def from_config(cls, config: Config):
@@ -72,9 +73,9 @@ class ConvMHSA2(tf.keras.Sequential):
         num_class,
     ):
 
-        conv_filters= [128, 128, 256, 256, 512]
-        kernel=[7, 7, 3, 7, 7]
-        strides=[1, 2, 1, 2, 2]
+        conv_filters = [128, 128, 256, 256, 512]
+        kernel = [7, 7, 3, 7, 7]
+        strides = [1, 2, 1, 2, 2]
         d_model = 512
         num_heads = 8
         dff = 512
@@ -98,7 +99,6 @@ class ConvMHSA2(tf.keras.Sequential):
                 EncoderLayer(d_model=d_model, num_heads=num_heads, dff=dff),
                 EncoderLayer(d_model=d_model, num_heads=num_heads, dff=dff),
                 tf.keras.layers.GlobalAveragePooling1D(),
-                tf.keras.layers.Dense(num_class, activation = "softmax")
+                tf.keras.layers.Dense(num_class, activation="softmax"),
             ]
         )
-
